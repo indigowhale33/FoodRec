@@ -21,8 +21,6 @@ app.use('/api', ingredientsRouter);
 app.use('/api', pantryRouter);
 app.use('/api', authRouter);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 // START THE SERVER
 // =====================================================
 app.listen(port);
