@@ -13,8 +13,8 @@ var UserFuncs = function() {
                             .toString();
         console.log("queryText: " + queryText);
 
-        var queryDB = require('../database')(queryText, function(mssg, data) {
-            res.json({"message": mssg, "requestType": "Log in", "data": data});
+        var queryDB = require('../database')(queryText, function(mssg, data) { 
+            sendMessage(res, mssg, data, "Log in");
         });
 
         return;
@@ -29,10 +29,10 @@ var UserFuncs = function() {
         console.log("query: ", queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
-            next(data);
+            next(data, res);
         });
 
-        function next(row) {
+        function next(row, res) {
                 
             var maxPantryID = row[0]['max'];
             console.log('max: ' + maxPantryID);
@@ -41,10 +41,10 @@ var UserFuncs = function() {
                 maxPantryID = 1;
 
             newuser.pantryID = parseInt(maxPantryID) + 1;
-            addNewUser(newuser);
+            addNewUser(newuser, res);
         }
 
-        function addNewUser(newuser) {
+        function addNewUser(newuser, res) {
             
             var addNewUserQuery = squel.insert()
                                         .into("users")
@@ -54,17 +54,36 @@ var UserFuncs = function() {
             console.log("query text: " + addNewUserQuery);
             
             var queryDB = require('../database')(addNewUserQuery, function(mssg, data) {
-                addNewPantry(newuser);
+
+                if(mssg == "Problem querying database") {
+                   
+                   /*
+                        USER ALREADY EXISTS
+                    */
+                }
+                else {
+                    addNewPantry(newuser, res);
+                }
             });
         }
 
-        function addNewPantry(newuser) {
+        function addNewPantry(newuser, res) {
 
-            var pantry = new Pantry(newuser.pantryID, "New Pantry", newuser.userName, '');
-            pantryFuncs.insertIntoPantry2(pantry, res);
+            console.log("" + newuser.userName + "'s Pantry");
+            var pantry = new Pantry(newuser.pantryID, newuser.userName + '\'\'s Pantry', newuser.userName, '');
+            var queryText = squel.insert()
+                                .into("pantries")
+                                .set("pantry_id", pantry.id)
+                                .set("pantry_name", pantry.name)
+                                .set("owner_name", pantry.owner)
+                                .set("contents", pantry.contents)
+                                .toString();
+            console.log("query text: " + queryText);
+
+            var queryDB = require('../database')(queryText, function(mssg, data) {
+                sendMessage(res, mssg, data, "User signup");
+            });
         }
-
-        return;
     }
 
     /**
@@ -99,7 +118,7 @@ var UserFuncs = function() {
 
             for(var i = 0; i < friendsArr.length; i++) {
                 if(friendsArr[i] === user.newFriend) {
-                    res.json({"message": "Friend already exists for user " + user.userName, "requestType": "Update friends", "data": null});
+                    res.status(200).json({"message": "Friend already exists for user " + user.userName, "status": 400, "requestType": "Update friends", "data": null});
                     return;
                 }
             }
@@ -110,8 +129,6 @@ var UserFuncs = function() {
             user.friendName = friendsList;
             changeFriends(user, res);
         });
-
-        return;
     }
 
     var changeFriends = function(user, res) {
@@ -130,11 +147,28 @@ var UserFuncs = function() {
         console.log(queryText);
 
         var DBQuery = require('../database')(queryText, function(mssg, data) {
-            res.json({"message": mssg, "requestType": "Update friends", "data": data});
+            sendMessage(res, mssg, data, "Update friends");
         });
 
 
         return;
+    }
+
+    function sendMessage(res, mssg, mRows, requestType) {
+
+        var response = {};
+
+        response['result'] = mssg;
+        response['requestType'] = requestType;
+        response['data'] = mRows;
+
+        if(mssg == "Problem querying database")
+            response['status'] = 400;
+        else
+            response['status'] = 200;
+
+        res.set("Access-Control-Allow-Origin", "*");
+        res.json(response);
     }
 
     return {

@@ -5,14 +5,14 @@ var PantryFuncs = function() {
     var getAllIngredients = function(res) {
 
         var queryText = squel.select()
+                            .field("nbd_num")
+                            .field("name")
                             .from("ingredients")
                             .toString();
         
         var dbQuery = require('../database')(queryText, function(mssg, data) {
-            res.status(200).json({"message": mssg, "requestType": "Get all ingredients", "data": data});
+            sendMessage(res, mssg, data, "Get all ingredients");
         });
-
-        return;
     }
 
     var getIngredientByParams = function(input, res) {
@@ -33,7 +33,7 @@ var PantryFuncs = function() {
             console.log(queryText);
 
             var dbQuery = require('../database')(queryText, function(mssg, data) {
-                res.json({"message": mssg, "requestType": "Get ingredient by params", "data": data});
+                sendMessage(res, mssg, data, "Get ingredient by params");
             });
         }
 
@@ -46,9 +46,26 @@ var PantryFuncs = function() {
             console.log(queryText);
 
             var dbQuery = require('../database')(queryText, function(mssg, data) {
-                res.json({"message": mssg, "requestType": "Get by params", "data": data});
+                sendMessage(res, mssg, data, "Get ingredient by params");
             })
         }
+    }
+
+    function sendMessage(res, mssg, mRows, requestType) {
+
+        var response = {};
+
+        response['result'] = mssg;
+        response['requestType'] = requestType;
+        response['data'] = mRows;
+
+        if(mssg == "Problem querying database")
+            response['status'] = 400;
+        else
+            response['status'] = 200;
+
+        res.set("Access-Control-Allow-Origin", "*");
+        res.json(response);
     }
 
     return {

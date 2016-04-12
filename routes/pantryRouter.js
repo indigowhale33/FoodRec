@@ -52,7 +52,7 @@ router.route('/pantry/getPantry/params')
     ex: http://localhost:8080/api/pantry/params?pantryID=1&pantryName=newName&ownerName=ex1&contents=Apples Bananas Oranges
 */
 router.route('/pantry/insertNewPantry/params')
-    .put(function(req, res) {
+    .post(function(req, res) {
 
         var pantry = new Pantry(
                             req.query.pantryID,

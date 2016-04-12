@@ -49,7 +49,7 @@ router.route('/recipes/generatePossibleRecipesFromPantry')
         directions=First, cook broth, then add chicken
 */
 router.route('/recipes/insertRecipe/params')
-    .put(function(req, res) {
+    .post(function(req, res) {
 
         var newRecipe = new Recipe (
                             req.query.recipeName,
@@ -70,10 +70,23 @@ router.route('/recipes/insertRecipe/params')
     ex:
     (1) http://localhost:8080/api/insertRecipe/params?recipeName=Chicken Soup
 */
-router.route('/recipes/generateNutritionFacts.params')
+router.route('/recipes/generateNutritionFacts/params')
     .get(function(req, res) {
 
         // TODO
+    });
+
+/**
+    Get a particular recipe by id
+
+    Params: recipeID
+
+    ex:
+    (1) http://localhost:8080/api/getRecipe/params?recipeID=1
+*/
+router.route('/recipes/getRecipe/params')
+    .get(function(req, res) {
+        recipeFuncs.getRecipeByID(req.query.recipeID, res);
     });
 
 

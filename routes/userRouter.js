@@ -23,9 +23,9 @@ router.route('/auth')
     Params: userName, newFriend
 
     ex:
-    (1) http://localhost:8080/api/auth/updateFriends?userName=Albert&newFriend=Cindy
+    (1) http://localhost:8080/api/auth/updateFriends/params?userName=Albert&newFriend=Cindy
 */
-router.route('/auth/updateFriends')
+router.route('/auth/updateFriends/params')
     .post(function(req, res) {
         
         var user = new User(req.query.userName, null);
@@ -35,7 +35,7 @@ router.route('/auth/updateFriends')
     });
 
 /*
-*    Authenticate user login info
+*   Authenticate user login info
     
     Params: userName
     
@@ -50,9 +50,7 @@ router.route('/auth/login/params')
     });
 
 /**
-    To create a new user, 
-    (1) create newuser in "users" table,
-    (2) create a new empty pantry with a unique ID for that user
+    Creates a new user
 
     Params: userName
 
@@ -60,10 +58,9 @@ router.route('/auth/login/params')
     (1) http://localhost:8080/api/auth/signup/params?userName=ex1
 */
 router.route('/auth/signup/params')
-    .put(function(req, res) {
+    .post(function(req, res) {
 
         var newuser = new User(req.query.userName, null);
-
         userFuncs.signup(newuser, res);
     });
 

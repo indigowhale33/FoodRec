@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var ingredientsRouter	= require('./routes/ingredientsRouter');
 var recipeRouter = require('./routes/recipeRouter');
 var pantryRouter = require('./routes/pantryRouter');
-var authRouter = require('./routes/authRouter');
+var authRouter = require('./routes/userRouter');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

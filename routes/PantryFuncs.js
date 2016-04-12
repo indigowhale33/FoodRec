@@ -13,10 +13,8 @@ var PantryFuncs = function() {
         console.log("query text: ", queryText);    
 
         var queryDB = require('../database')(queryText, function(mssg, mRows){
-            res.json({"message": mssg, "requestType": "Get from pantry", "data": mRows});
-        });        
-
-        return;    
+            sendMessage(res, mssg, mRows, "Get pantry");
+        });           
     }
 
     /*
@@ -34,7 +32,7 @@ var PantryFuncs = function() {
         console.log("query text: " + queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, mRows) {
-            res.send({'result': mssg, "requestType": "Insert into pantry", "data": mRows});
+            sendMessage(res, mssg, mRows, "Insert into pantry");
         });
 
         return;
@@ -49,7 +47,7 @@ var PantryFuncs = function() {
                             .toString();
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
-            return res.json({"message": mssg, "queryType": "Update pantry contents for user " + pantry.owner, "data": data});
+            sendMessage(res, mssg, mRows, "Update pantry contents for user");
         });
     }
 
@@ -68,7 +66,7 @@ var PantryFuncs = function() {
         console.log("query text: " + queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
-            return res.json({"message": mssg, "queryType": "Add user item to pantry", "data": data});
+            sendMessage(res, mssg, mRows, "Add user item to pantry");
         });
 
         // Cases: (1) When the ingredient is not there
@@ -80,6 +78,23 @@ var PantryFuncs = function() {
         // ADD CODE HERE
 
         return;
+    }
+
+    function sendMessage(res, mssg, mRows, requestType) {
+
+        var response = {};
+
+        response['result'] = mssg;
+        response['requestType'] = requestType;
+        response['data'] = mRows;
+
+        if(mssg == "Problem querying database")
+            response['status'] = 400;
+        else
+            response['status'] = 200;
+
+        res.set("Access-Control-Allow-Origin", "*");
+        res.json(response);
     }
 
     return {

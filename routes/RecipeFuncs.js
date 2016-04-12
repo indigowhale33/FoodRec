@@ -16,13 +16,23 @@ var RecipeFuncs = function() {
         console.log(queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
-            
-            console.log("finished...");
-            res.status(200).json({"message": mssg, "requestType": "Insert recipe", "data": data});
-        
+            sendMessage(res, mssg, data, "Insert recipe");
         });
 
         return;
+    }
+
+    var getRecipeByID = function(id, res) {
+
+        var queryText = squel.select()
+                            .from("recipes")
+                            .where("id = ?", id)
+                            .toString();
+        console.log(queryText);
+
+        var queryDB = require('../database')(queryText, function(mssg, data) {
+            sendMessage(res, mssg, data, "Get recipe by ID");
+        });
     }
 
     /**
@@ -34,9 +44,27 @@ var RecipeFuncs = function() {
         
     }
 
+    function sendMessage(res, mssg, mRows, requestType) {
+
+        var response = {};
+
+        response['result'] = mssg;
+        response['requestType'] = requestType;
+        response['data'] = mRows;
+
+        if(mssg == "Problem querying database")
+            response['status'] = 400;
+        else
+            response['status'] = 200;
+
+        res.set("Access-Control-Allow-Origin", "*");
+        res.json(response);
+    }
+
     return {
         insert: insert,
-        generateAllPossibleRecipes: generateAllPossibleRecipes
+        generateAllPossibleRecipes: generateAllPossibleRecipes,
+        getRecipeByID: getRecipeByID
     }
 
 }();
