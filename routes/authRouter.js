@@ -20,6 +20,8 @@ router.route('/auth')
 /**
     Update friends.
 
+    Params: userName, newFriend
+
     ex:
     (1) http://localhost:8080/api/auth/updateFriends?userName=Albert&newFriend=Cindy
 */

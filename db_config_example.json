@@ -3,5 +3,5 @@
 	"password": "example_password",
 	"database": "group6_cook",
 	"host": "localhost",
-	"port": 5432
+	"port": 8000
 }

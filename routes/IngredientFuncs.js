@@ -41,7 +41,7 @@ var PantryFuncs = function() {
 
             var queryText = squel.select()
                                 .from("ingredients")
-                                .where("ndb_num = ?", ndb_num)
+                                .where("nbd_num = ?", ndb_num)
                                 .toString();
             console.log(queryText);
 

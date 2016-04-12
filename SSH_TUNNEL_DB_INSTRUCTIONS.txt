@@ -1,0 +1,48 @@
+To connect to remote psql server on db@cs.wm.edu:
+
+ON WINDOWS:
+1) Open ssh to db.cs.wm.edu through PUTTY.
+	a) hostname: db.cs.wm.edu
+	b) port: 22
+	c) source port: 8000
+	d) destination: 127.0.0.1:5432
+	e) Save your session before clicking "Open"
+
+2) In pgAdminIII:
+	a) Create new connection to server
+	b) name: remoteDB
+	c) host: localhost
+	d) port: 8000
+	e) Maintenance DB: postgres
+	f) username/password: self-explanatory
+
+
+3) In "db_config.json":
+	a) input your db username
+	b) input your db password
+	c) host is "localhost"
+	d) port: 8000
+
+ON LINUX:
+1) Use ssh to db.cs.wm.edu through command line.
+	a) ssh -L 8000:127.0.0.1:5432 <username>@db.cs.wm.edu
+	b) In "db_config.json", leave everything same except username/password
+	{
+		"user": "username",
+		"password": "password",
+		"database": "group6_cook",
+		"host": "localhost",
+		"port": 8000
+	}
+2) Query through the food recommendation app!
+
+** What is going on here?
+PuTTy connects to db.cs.wm.edu through port 22, allowing pgAdmin to establish a connection to
+the database server. This connection stays active as long as the PuTTy session is open. 
+
+PuTTy intercepts communications sent from pgAdmin to localhost:8000. The information is
+transferred across the internet via SSH, on port 22. When it arrives there, the SSH server
+sends the info onto psql via port 5432. As far as psql knows, the traffic came in locally,
+on the correct port.
+
+http://lab.usgin.org/groups/usgin-amazon-virtual-server-development/connecting-postgresql-ssh-tunneling

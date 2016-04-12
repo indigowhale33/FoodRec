@@ -2,7 +2,7 @@ var express = require('express');
 var Pantry  = require('../models/pantry');
 var squel = require("squel");
 var router = express.Router();
-var pantryFuncs = require('./pantryFuncs');
+var pantryFuncs = require('./PantryFuncs');
 
 router.use(function(req, res, next) {
     console.log("REQUEST: ", req.method, req.url);
