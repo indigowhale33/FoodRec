@@ -28,6 +28,8 @@ var PantryFuncs = function() {
                             .set("pantry_id", pantry.id)
                             .set("pantry_name", pantry.name)
                             .set("owner_name", pantry.owner)
+                            .set("ingredient_id", pantry.ingred_id)
+                            .set("amount", pantry.amount)
                             .toString();
         console.log("query text: " + queryText);
 
@@ -42,7 +44,7 @@ var PantryFuncs = function() {
 
         var queryText = squel.update()
                             .table("pantries")
-                            .set("content", pantry.contents)
+                            .set("ingredient_id", pantry.contents)
                             .where("owner_name = ?", pantry.owner)
                             .toString();
 

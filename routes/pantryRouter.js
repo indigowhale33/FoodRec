@@ -19,12 +19,13 @@ router.route('/pantry')
                 "pantryID -- pantry id<br/>" +
                 "pantryName -- pantry name<br/>" +
                 "ownerName -- name of owner<br/>" +
-                "contents -- ingredients inside pantry<br/>" + 
-                "toAdd -- ingredient to add into contents<br/>"
+                "ingredientID -- ingredients inside pantry<br/>" + 
+                "ingredientAmount -- amount of the ingredient<br/>" +
+                "ingredientToAdd -- ingredient_id to add<br/>"
         );
     });
 
-/*
+/**
     Retrieve pantry.
 
     Params: pantryID, ownerName
@@ -45,9 +46,17 @@ router.route('/pantry/getPantry/params')
     })
 
 /**
-    Insert a new pantry
 
-    Params: pantryID, pantryName, ownerName
+    DO NOT USE. TO FIX.
+
+
+    Insert a new pantry. Only use when you really NEED to
+    insert a new pantry for some reason. 
+
+    User sign-up automatically
+    creates a new pantry, so don't call it twice.
+
+    Params: pantryID, pantryName, ownerName, ingredientID, ingredientAmount
 
     ex: http://localhost:8080/api/pantry/params?pantryID=1&pantryName=newName&ownerName=ex1
 */
@@ -66,7 +75,7 @@ router.route('/pantry/insertNewPantry/params')
 /*
     Insert ingredient into user pantry
 
-    Params: pantryID, pantryName, ownerName, toAdd
+    Params: pantryID, pantryName, ownerName, ingredientID, amount
 
     http://localhost:8080/api/pantry/addIngredientToPantry/params?pantryName=New Pantry&ownerName=ex1&pantryID=4&toAdd=Cheese
 */
@@ -74,9 +83,10 @@ router.route('/pantry/addIngredientToPantry/params')
     .post(function(req, res) {
 
         var userName = req.query.ownerName;
-        var ingredientToAdd = req.query.toAdd;
         var pantryID = req.query.pantryID;
         var pantryName = req.query.pantryName;
+        var ingredientToAdd = req.query.ingredientID;
+        var amount = req.query.amount;
 
         console.log("to add: ", ingredientToAdd);
 
@@ -84,17 +94,19 @@ router.route('/pantry/addIngredientToPantry/params')
         var mRows = [];
         var existsText = squel.select()
                                 .from("pantries")
-                                .where("contents = ?", ingredientToAdd)
+                                .where("ingredient_id = ?", ingredientToAdd)
                                 .where("owner_name = ?", userName)
                                 .toString();
         console.log(existsText);
 
         var queryDB = require('../database')(existsText, function(mssg, data) {
 
+            console.log("data: " + data);
+
             // if ingredient not in pantry, add it
             if(mRows.length === 0) {
-                var pantry = new Pantry(pantryID, pantryName, userName, ingredientToAdd);
-                pantryFuncs.updatePantryContents(pantry, res);
+                var pantry = new Pantry(pantryID, pantryName, userName, ingredientToAdd, amount);
+                pantryFuncs.insertIntoPantry(pantry, res);
             }
             // ingredient already in pantry, 
             else {
