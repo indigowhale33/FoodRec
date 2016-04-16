@@ -11,6 +11,7 @@
     "cookie-parser": "*",
     "express": "*",
     "pg": "*",
-    "squel": "*"
+    "squel": "*",
+    "async": "*"
   }
 }

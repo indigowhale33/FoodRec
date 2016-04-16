@@ -26,16 +26,14 @@ router.route('/recipes')
 
     Params: userName
 */
-router.route('/recipes/generatePossibleRecipesFromPantry')
+router.route('/recipes/generatePossibleRecipesFromPantry/params')
 
     .get(function(req, res) {
 
         var userName = req.query.userName;
 
         console.log(userName);
-        recipeFuncs.generateAllPossibleRecipes(userName, res);
-
-        // TODO
+        recipeFuncs.generatePossibleRecipesFromPantry(userName, res);
     });
 
 /**

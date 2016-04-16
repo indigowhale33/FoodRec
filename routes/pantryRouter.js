@@ -47,9 +47,9 @@ router.route('/pantry/getPantry/params')
 /**
     Insert a new pantry
 
-    Params: pantryID, pantryName, ownerName, contents
+    Params: pantryID, pantryName, ownerName
 
-    ex: http://localhost:8080/api/pantry/params?pantryID=1&pantryName=newName&ownerName=ex1&contents=Apples Bananas Oranges
+    ex: http://localhost:8080/api/pantry/params?pantryID=1&pantryName=newName&ownerName=ex1
 */
 router.route('/pantry/insertNewPantry/params')
     .post(function(req, res) {
@@ -68,7 +68,7 @@ router.route('/pantry/insertNewPantry/params')
 
     Params: pantryID, pantryName, ownerName, toAdd
 
-    http://localhost:8080/api/pantry/addItemToPantry/params?pantryName=New Pantry&ownerName=ex1&pantryID=4&toAdd=Cheese
+    http://localhost:8080/api/pantry/addIngredientToPantry/params?pantryName=New Pantry&ownerName=ex1&pantryID=4&toAdd=Cheese
 */
 router.route('/pantry/addIngredientToPantry/params')
     .post(function(req, res) {

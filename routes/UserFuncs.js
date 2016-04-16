@@ -57,6 +57,7 @@ var UserFuncs = function() {
 
                 if(mssg == "Problem querying database") {
                    
+                   
                    /*
                         USER ALREADY EXISTS
                     */
@@ -76,7 +77,6 @@ var UserFuncs = function() {
                                 .set("pantry_id", pantry.id)
                                 .set("pantry_name", pantry.name)
                                 .set("owner_name", pantry.owner)
-                                .set("contents", pantry.contents)
                                 .toString();
             console.log("query text: " + queryText);
 

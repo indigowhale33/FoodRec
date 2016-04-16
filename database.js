@@ -35,7 +35,7 @@ function makeConnectionString(obj) {
 
 function query(connectionString, queryText, callBack) {
 
-    console.log("connectionString: ", connectionString);
+    //console.log("connectionString: ", connectionString);
     console.log("queryText: ", queryText);
 
     var client = new pg.Client(connectionString);

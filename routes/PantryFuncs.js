@@ -15,19 +15,19 @@ var PantryFuncs = function() {
         var queryDB = require('../database')(queryText, function(mssg, mRows){
             sendMessage(res, mssg, mRows, "Get pantry");
         });           
-    }
+    };
 
     /*
         Add new pantry
     */
     var insertIntoPantry = function(pantry, res) {
 
+        // Add pantry to pantries table
         var queryText = squel.insert()
                             .into("pantries")
                             .set("pantry_id", pantry.id)
                             .set("pantry_name", pantry.name)
                             .set("owner_name", pantry.owner)
-                            .set("contents", pantry.contents)
                             .toString();
         console.log("query text: " + queryText);
 
@@ -36,20 +36,20 @@ var PantryFuncs = function() {
         });
 
         return;
-    }
+    };
 
     var updatePantryContents = function(pantry, res) {
 
         var queryText = squel.update()
                             .table("pantries")
-                            .set("contents", pantry.contents)
+                            .set("content", pantry.contents)
                             .where("owner_name = ?", pantry.owner)
                             .toString();
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
             sendMessage(res, mssg, mRows, "Update pantry contents for user");
         });
-    }
+    };
 
     /*
         Add ingredeitn to pantry contents
@@ -78,7 +78,7 @@ var PantryFuncs = function() {
         // ADD CODE HERE
 
         return;
-    }
+    };
 
     function sendMessage(res, mssg, mRows, requestType) {
 

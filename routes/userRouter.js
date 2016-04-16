@@ -50,7 +50,7 @@ router.route('/auth/login/params')
     });
 
 /**
-    Creates a new user
+    Creates a new user. Automatically creates a new pantry.
 
     Params: userName
 

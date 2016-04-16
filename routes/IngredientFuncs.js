@@ -13,7 +13,7 @@ var PantryFuncs = function() {
         var dbQuery = require('../database')(queryText, function(mssg, data) {
             sendMessage(res, mssg, data, "Get all ingredients");
         });
-    }
+    };
 
     var getIngredientByParams = function(input, res) {
 
@@ -49,7 +49,7 @@ var PantryFuncs = function() {
                 sendMessage(res, mssg, data, "Get ingredient by params");
             })
         }
-    }
+    };
 
     function sendMessage(res, mssg, mRows, requestType) {
 
@@ -71,7 +71,7 @@ var PantryFuncs = function() {
     return {
         getAllIngredients: getAllIngredients,
         getIngredientByParams: getIngredientByParams
-    }
+    };
 
 }();
 
