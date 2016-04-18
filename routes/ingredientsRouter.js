@@ -10,11 +10,14 @@ router.route('/ingredients')
         res.send("You didn't specify any arguments!<br/>" +
                 "Here are some which are currently supported:<br/><br/>" + 
                 "Parameters:<br/>" +
-                "ingredName -- name of ingredient<br/>" +
-                "ndbNum -- ndb_num of the ingredient>br/>");
+                "name -- name column of ingredients table<br/>" +
+                "id -- id column of the ingredients table>br/>");
     });
 
 /**
+
+    WORKS -- I TESTED w/ REMOTE DB
+
     Obtains all possible ingredient names from 
     the ingredients table.
 
@@ -25,27 +28,42 @@ router.route('/ingredients/getAll')
         ingredientFuncs.getAllIngredients(res);
     });
 
-/*
-    Get ingredients by either their names OR their ndb_num
 
-    Params: ingredName OR nbdNum OR both
+/*
+    WORKS -- I TESTED w/ REMOTE DB
+
+    Get ingredients containing a certain substring.
+    Useful for filtering ingredients based on what user inputs.
+    Case insensitive.
+
+    Params: substring
+
+    ex: 
+    (1) http://localhost:8080/api/ingredients/params?substring=chicken
+*/
+router.route('/ingredients/getIngredientBySubstring/params')
+    .get(function(req, res) {
+
+        ingredientFuncs.getIngredientBySubstring(req.query.substring, res);
+    })
+
+
+/*
+    WORKS -- I TESTED W/ REMOTE DB
+
+    Get ingredients by either their name OR id
+
+    Params: name OR id
 
     ex: 
     (1) http://localhost:8080/api/ingredients/params?ingredName=Butter
-    (2) http://localhost:8080/api/ingredients/params?ndbNum=2222
-    (3) http://localhost:8080/api/ingredients/params?ingredName=Butter&ndbNum=1
+    (2) http://localhost:8080/api/ingredients/params?id=2222
 */
 router.route('/ingredients/getIngredient/params')
     .get(function(req, res) {
 
-        console.log("get ingredient");
-
-        var ingred = new Ingredient(req.query.ingredName, req.query.nbdNum);
+        var ingred = new Ingredient(req.query.name, req.query.id);
         ingredientFuncs.getIngredientByParams(ingred, res);
-    })
-
-    /**
-        Cannot insert ingredient because we are using an existing set of ingredients
-    */
+    });
 
 module.exports = router;

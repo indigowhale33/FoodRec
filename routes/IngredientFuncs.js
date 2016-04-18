@@ -5,23 +5,24 @@ var PantryFuncs = function() {
     var getAllIngredients = function(res) {
 
         var queryText = squel.select()
-                            .field("nbd_num")
+                            .field("id")
                             .field("name")
                             .from("ingredients")
                             .toString();
         
         var dbQuery = require('../database')(queryText, function(mssg, data) {
-            sendMessage(res, mssg, data, "Get all ingredients");
+
+            if(data == null || data.length < 1)
+                sendMessage(res, 400, "No ingredients in ingredients table", data, "Get all ingredients");
+            else
+                sendMessage(res, 200, mssg, data, "Get all ingredients");
         });
     };
 
     var getIngredientByParams = function(input, res) {
 
         var name = input.ingredName;
-        var ndb_num = input.ndbNum;
-
-        console.log(name);
-        console.log(ndb_num);
+        var id = input.ndbNum;
 
         if(name != null) {
             
@@ -29,40 +30,60 @@ var PantryFuncs = function() {
                             .from("ingredients")
                             .where("name = ?", name)
                             .toString();
-                            
-            console.log(queryText);
 
             var dbQuery = require('../database')(queryText, function(mssg, data) {
-                sendMessage(res, mssg, data, "Get ingredient by params");
+                
+                if(data == null || data.length < 1)
+                    sendMessage(res, 400, "Could not find ingredient by name " + name, data, "Get ingredient by params");
+                else
+                    sendMessage(res, 200, mssg, data, "Get ingredient by params");
+
             });
         }
 
-        else if(ndb_num != null) {
+        else if(id != null) {
 
             var queryText = squel.select()
                                 .from("ingredients")
-                                .where("nbd_num = ?", ndb_num)
+                                .where("id = " + id)
                                 .toString();
-            console.log(queryText);
 
             var dbQuery = require('../database')(queryText, function(mssg, data) {
-                sendMessage(res, mssg, data, "Get ingredient by params");
-            })
+
+                if(data == null || data.length < 1)
+                    sendMessage(res, 400, "Could not find ingredient by id: " + id, data, "Get ingredient by params");
+                else
+                    sendMessage(res, 200, mssg, data, "Get ingredient by params");
+            });
         }
     };
 
-    function sendMessage(res, mssg, mRows, requestType) {
+    var getIngredientBySubstring = function(substring, res) {
+
+        var queryText = squel.select()
+                            .field("id")
+                            .field("name")
+                            .from("ingredients")
+                            .where("UPPER(name) LIKE UPPER(\'%" + substring + "%\')")
+                            .toString();
+
+        var dbQuery = require('../database')(queryText, function(mssg, data) {
+            
+            if(data == null || data.length < 1)
+                    sendMessage(res, 400, "Could not find ingredient with substring: " + substring, data, "Get ingredient containing substring");
+            else
+                sendMessage(res, 200, mssg, data, "Get ingredient containing substring");
+        });
+    };
+
+    function sendMessage(res, status, mssg, mRows, requestType) {
 
         var response = {};
 
+        response['status'] = status;
         response['result'] = mssg;
         response['requestType'] = requestType;
         response['data'] = mRows;
-
-        if(mssg == "Problem querying database")
-            response['status'] = 400;
-        else
-            response['status'] = 200;
 
         res.set("Access-Control-Allow-Origin", "*");
         res.json(response);
@@ -70,7 +91,8 @@ var PantryFuncs = function() {
 
     return {
         getAllIngredients: getAllIngredients,
-        getIngredientByParams: getIngredientByParams
+        getIngredientByParams: getIngredientByParams,
+        getIngredientBySubstring: getIngredientBySubstring
     };
 
 }();
