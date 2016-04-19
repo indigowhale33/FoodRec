@@ -3,17 +3,19 @@ var squel = require("squel");
 
 var PantryFuncs = function() {
 
-    var getFromPantry = function(pantry, res) {
+    var getPantry = function(owner_name, res) {
 
         var queryText = squel.select()
                             .from("pantries")
-                            .where("pantry_id=" + pantry.id)
-                            .where("owner_name= ?", pantry.owner)
-                            .toString();
-        console.log("query text: ", queryText);    
+                            .where("owner_name= ?", owner_name)
+                            .toString();    
 
-        var queryDB = require('../database')(queryText, function(mssg, mRows){
-            sendMessage(res, mssg, mRows, "Get pantry");
+        var queryDB = require('../database')(queryText, function(mssg, data){
+            
+            if(data == null || data.length < 1)
+                sendMessage(res, 400, "Could not get pantry where owner name: " + owner_name, data, "Get pantry");
+            else
+                sendMessage(res, 200, mssg, data, "Get pantry");
         });           
     };
 
@@ -54,7 +56,7 @@ var PantryFuncs = function() {
     };
 
     /*
-        Add ingredeitn to pantry contents
+        Add ingredient to pantry contents
     */
     var insertIntoPantry2 = function(pantry, res) {
 
@@ -82,18 +84,14 @@ var PantryFuncs = function() {
         return;
     };
 
-    function sendMessage(res, mssg, mRows, requestType) {
+    function sendMessage(res, status, mssg, mRows, requestType) {
 
         var response = {};
 
+        response['status'] = status;
         response['result'] = mssg;
         response['requestType'] = requestType;
         response['data'] = mRows;
-
-        if(mssg == "Problem querying database")
-            response['status'] = 400;
-        else
-            response['status'] = 200;
 
         res.set("Access-Control-Allow-Origin", "*");
         res.json(response);
@@ -102,7 +100,7 @@ var PantryFuncs = function() {
     return {
         insertIntoPantry: insertIntoPantry,
         insertIntoPantry2: insertIntoPantry2,
-        getFromPantry: getFromPantry,
+        getPantry: getPantry,
         updatePantryContents: updatePantryContents
     }
 

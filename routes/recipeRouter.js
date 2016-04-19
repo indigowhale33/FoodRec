@@ -78,5 +78,60 @@ router.route('/recipes/getRecipe/params')
         recipeFuncs.getRecipeByID(req.query.id, res);
     });
 
+/**
+
+    WORKS! TESTED W/ REMOTE DB
+
+    Generates ingredients that, when added to the pantry, 
+    will allow for more recipes. Logic behind it WORKS...
+
+    Params: user_name
+
+    ex: 
+    (1) http://localhost:8080/api/getPossibleRecipes/params?user_name=10000
+
+    Returns: 
+
+    {
+      "status": 200,
+      "result": "Query successful!",
+      "requestType": "Get ingredients that, when added, will allow for more recipes",
+      "data": [
+        {
+          "recipe_id": 10299,
+          "ingredients_needed_count": 1,
+          "ingredients_needed": [
+            {
+              "ingredient_id": 13880,
+              "amount": "teaspoon 1"
+            }
+          ]
+        },
+        {
+          "recipe_id": 10050,
+          "ingredients_needed_count": 1,
+          "ingredients_needed": [
+            {
+              "ingredient_id": 13539,
+              "amount": "ounce 1"
+            }
+          ]
+        },
+        ...
+    }
+
+    This call will return a JSON that looks like the above. Each JSON returns a 
+    list of recipes that can potentially be made with a few more ingredients. 
+
+    It's sorted by "ingredients_needed_count", which is the total number of ingredients still needed to 
+    cook that recipe. I also gave the list of ingredients that the user would need on top of 
+    items in the pantry in order to cook that recipe.
+*/
+router.route('/recipes/getPossibleRecipes/params')
+    .get(function(req, res) {
+
+        recipeFuncs.getPossibleRecipes(req.query.user_name, res);
+    });
+
 
 module.exports = router;
