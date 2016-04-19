@@ -33,13 +33,13 @@ var RecipeFuncs = function() {
         var queryText = "SELECT * " +
                         "FROM " +
                         "( " +
-                        "SELECT recipe_id " +
-                        "FROM recipe_ingredients ri LEFT JOIN pantries p " +
-                            "ON ri.ingredient_id = p.ingredient_id AND p.owner_name = \'" + userName + "\' " +
-                        "GROUP BY recipe_id " +
-                        "HAVING COUNT(*) = COUNT(p.ingredient_id) " +
+                            "SELECT recipe_id " +
+                            "FROM recipe_ingredients ri LEFT JOIN pantries p " +
+                                "ON ri.ingredient_id = p.ingredient_id AND p.owner_name = \'" + userName + "\' " +
+                            "GROUP BY recipe_id " +
+                            "HAVING COUNT(*) = COUNT(p.ingredient_id) " +
                         ") q JOIN recipes r " +
-                        "ON q.recipe_id = r.id";
+                            "ON q.recipe_id = r.id";
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
             
@@ -48,6 +48,7 @@ var RecipeFuncs = function() {
                                     "Could not find any recipes (recipe_id does not exist)");
            }
            else {
+                console.log("data: " + JSON.stringify(data, null, 2));
                 sendMessage(res, 200, "Success!", data, "Get recipe based on ingredients in pantry");
            }          
         }); 
@@ -126,7 +127,7 @@ var RecipeFuncs = function() {
                     continue;
                 }
 
-                var gramVal = convertToGrams(parsed, unitsNdx)/100;
+                var gramVal = convertToGrams(parsed, unitsNdx)/100; /// WHY DIVIDE BY 100???
                 updateTotals(res, totals, gramVal, data, i);
             }
 
@@ -214,6 +215,90 @@ var RecipeFuncs = function() {
         }
     };
 
+    /**
+        Generates ingredients that, when added to the pantry, 
+        will allow for more recipes
+    */
+    var getPossibleRecipes = function(user_name, res) {
+
+        var queryText_check = "SELECT ri_inner.ingredient_id " +
+                            "FROM recipe_ingredients ri_inner JOIN pantries p " +
+                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id";
+
+        var queryDB_check = require('../database')(queryText_check, function(mssg, data) { 
+
+            //console.log("data_check: " + JSON.stringify(data, null, 2));
+
+            if(data == null || data.length < 1) {
+                sendMessage(res, 400, "Either user has an invalid ingredient id or user does not exist: " + user_name, data, "Get possible recipes");
+                return;
+            }
+
+            next_step(user_name, res);
+        });
+
+        function next_step(user_name, res) {
+
+            var queryText = "SELECT * " +
+                        "FROM recipe_ingredients ri_outer " +
+                        "WHERE ri_outer.ingredient_id NOT IN " +
+                        "( " +
+                            "SELECT ri_inner.ingredient_id " +
+                            "FROM recipe_ingredients ri_inner JOIN pantries p " +
+                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
+                        ")";
+
+            var queryDB = require('../database')(queryText, function(mssg, data) {                 
+
+                //console.log("data: ")
+                if(data == null || data.length < 1) {
+                    sendMessage(res, 400, "Could not find any ingredients that will help : " + user_name, data, "Get possible recipes");
+                    return;
+                }
+                
+                var formatted = [];
+                for(var i = 0; i < data.length; i++) {
+
+                    var keyExistsInArr = false;
+                    for(var j = 0; j < formatted.length; j++) {
+
+                        if(formatted[j] == null)
+                            continue;
+                        if(formatted[j]['recipe_id'] == data[i]['recipe_id']) {
+                            keyExistsInArr = true;
+                            formatted[j]['ingredients_needed'].push({"ingredient_id":data[i]['ingredient_id'], "amount":data[i]['amount']});
+                            formatted[j]['ingredients_needed_count'] += 1;
+                        }
+                    }
+
+                    if(!keyExistsInArr) {
+
+                        formatted.push(
+                            {
+                                "recipe_id": data[i]['recipe_id'],
+                                "ingredients_needed_count": 1,
+                                "ingredients_needed": [{"ingredient_id": data[i]['ingredient_id'], 
+                                                "amount":data[i]['amount']
+                                }]
+                            }
+                        );
+                    }
+                }
+
+                if(formatted.length == 0) {
+                    sendMessage(res, 400, "Could not find any other ingredients for any other recipes", [], "Get ingredients that, when added, will allow for more recipes");
+                }
+
+                formatted.sort(function(a, b) {
+                    return parseInt(a['ingredients_needed_count']) - parseInt(b['ingredients_needed_count']);
+                });
+
+                sendMessage(res, 200, mssg, formatted.slice(0,50), "Get ingredients that, when added, will allow for more recipes");
+            });
+        }
+    }
+
+
     function sendMessage(res, status, mssg, mRows, requestType) {
 
         var response = {};
@@ -230,7 +315,8 @@ var RecipeFuncs = function() {
     return {
         generatePossibleRecipesFromPantry: generatePossibleRecipesFromPantry,
         getRecipeByID: getRecipeByID,
-        generateNutritionFacts: generateNutritionFacts
+        generateNutritionFacts: generateNutritionFacts,
+        getPossibleRecipes: getPossibleRecipes
     };
 
 }();
