@@ -2,6 +2,7 @@
 
 Set up:
 (1) Clone repo into a local folder. Make sure to have Node installed.
+
 (2) Open up a terminal in that folder. Install project with:
 ```javascript
 npm install
@@ -31,6 +32,7 @@ I recommend using `nodemon` if you're doing a lot of editing.
 ### Routes
 All requests into the backend come in the form of parameterized URL. I return a JSON object with the same keys for **all** requests. It looks like this:
 
+```json
 {
   "status": 200,
   "result": "Query successful!",
@@ -39,8 +41,9 @@ All requests into the backend come in the form of parameterized URL. I return a 
 		...... *data here* .....
   }
 }
+```
 
-- The `data` key represents the state of the call. `200` means success. `400` means failure. 
+- The `status` key represents the state of the call. `200` means success. `400` means failure. 
 - The `result` key contains a message about the result of the query. It'll say a variety of things like "Query successful" or "Insert into pantry successful" or "Cannot find ingredient with the specified id". 
 - The `requestType` key contains the type of request you sent.
 - The `data` key contains data returned to you if you did a GET request.
