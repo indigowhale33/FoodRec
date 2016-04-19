@@ -3,36 +3,24 @@ var async   = require('async');
 
 var RecipeFuncs = function() {
 
-    var insert = function(newRecipe, res) {
-
-        var queryText = squel.insert()
-                            .into("recipes")
-                            .set("recipe_name", newRecipe.recipeName)
-                            .set("ingredients", newRecipe.ingredients)
-                            .set("prep_time", newRecipe.prepTime)
-                            .set("description", newRecipe.description)
-                            .set("directions", newRecipe.directions)
-                            .toString();
-
-        console.log(queryText);
-
-        var queryDB = require('../database')(queryText, function(mssg, data) {
-            sendMessage(res, mssg, data, "Insert recipe");
-        });
-
-        return;
-    };
-
+    /**
+    *   Get recipe by ID
+    */
     var getRecipeByID = function(id, res) {
 
         var queryText = squel.select()
                             .from("recipes")
                             .where("id = ?", id)
                             .toString();
-        console.log(queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
-            sendMessage(res, mssg, data, "Get recipe by ID");
+            
+            if(data == null || data.length < 1) {
+                sendMessage(res, 400, "Could not find any recipe matching that ID", data, "Get recipe by ID");
+            }
+            else {
+                sendMessage(res, 200, mssg, data, "Get recipe by ID");
+            }
         });
     };
 
@@ -41,136 +29,208 @@ var RecipeFuncs = function() {
         ingredients from the user's pantry.
     */
     var generatePossibleRecipesFromPantry = function(userName, res) {
-    	
-    	var queryText = squel.select()
-                            .field("DISTINCT(recipe_ID)")
-                            .from("recipe_ingredients")
-                            .where("ingredient_id IN ?", 
-                                squel.select()
-                                    .field("ingredient_id")
-                                    .from("pantries")
-                                    .where("owner_name = ?", userName) )
-                            .toString();
-        console.log("queryText: " + queryText);
+
+        var queryText = "SELECT * " +
+                        "FROM " +
+                        "( " +
+                        "SELECT recipe_id " +
+                        "FROM recipe_ingredients ri LEFT JOIN pantries p " +
+                            "ON ri.ingredient_id = p.ingredient_id AND p.owner_name = \'" + userName + "\' " +
+                        "GROUP BY recipe_id " +
+                        "HAVING COUNT(*) = COUNT(p.ingredient_id) " +
+                        ") q JOIN recipes r " +
+                        "ON q.recipe_id = r.id";
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
             
             if(data == null || data.length == 0 || data[0]['recipe_id'] == null) {
-                sendMessage(res, "Problem querying database...", data, "Could not find any recipes (recipe_id does not exist)");
-                return;
+                sendMessage(res, 400, "Could not find any recipes from pantry items...", data, 
+                                    "Could not find any recipes (recipe_id does not exist)");
            }
-        
-            getRecipes(data, res);
+           else {
+                sendMessage(res, 200, "Success!", data, "Get recipe based on ingredients in pantry");
+           }          
         }); 
+    };
 
-        function getRecipes(data_recipe_ids, res) {
+    /**
+    *
+    */
+    var generateNutritionFacts = function (recipeID, res) {
 
-            console.log(JSON.stringify(data_recipe_ids, null, 2));
+        var totals = {
+                recipe_id: recipeID, serving_size: 0.00, kcals: 0.00,
+                protein: 0.00, fat: 0.00, carbohydrates: 0.00,
+                fiber: 0.00, calcium: 0.00, iron: 0.00, magnesium: 0.00,
+                phosphorous: 0.00, potassium: 0.00, sodium: 0.00,
+                zinc: 0.00, copper: 0.00, manganese: 0.00,
+                selenium: 0.00, vitc: 0.00, thiamin: 0.00,
+                riboflavin: 0.00, niacin: 0.00, pantothenic_acid: 0.00,
+                vitb6: 0.00, folate: 0.00, choline: 0.00, vitb12: 0.00,
+                vita: 0.00, vite: 0.00, vitd: 0.00,
+                vitk: 0.00, cholesterol: 0.00
+            }; 
 
-            if(data_recipe_ids == null || data_recipe_ids.length == 0) {
-                sendMessage(res, "Could not find any recipes from pantry items...", data_recipe_ids, "Get all possible recipes based on ingredients from user's pantry.");
+        var units = ['cup', 'teaspoon', 'tablespoon', 'inch', 
+                    'ounce', 'oz', 'pound', 'lb', 'pint', 'gram', 'g'];
+
+        var queryText = squel.select()
+                                .from("recipe_ingredients as ri")
+                                .from("ingredients as i")
+                                .where("ri.recipe_id = " + recipeID)
+                                .where("ingredient_id = i.id")
+                                .toString();
+
+        var queryDB = require('../database')(queryText, function(mssg, data) {                 
+            
+            if(data == null || data.length < 1) {
+                sendMessage(res, 400, "Could not find recipe with id " + recipeID, data, "Generate nutrition facts for recipe");
                 return;
             }
 
-            console.log("data before: " + JSON.stringify(data_recipe_ids, null, 2));
-            console.log("--------------------------------------------");
+            sumNutritionInfo(res, mssg, data);
+        });
 
-            var tasks = [];
-            for(var i = 0; i < data_recipe_ids.length; i++) {
-                var obj = data_recipe_ids[i];
-                console.log("obj: " + JSON.stringify(obj, null, 2));
-                tasks.push(getExtractor(obj['recipe_id']));
-            }
+        function sumNutritionInfo(res, mssg, data) {
 
-            console.log("--------------------------------------------");
+            for(var i = 0; i < data.length; i++) {
 
-            async.series(tasks,
-            function(err, tasks) {
-                console.log("result of async: " + JSON.stringify(tasks, null, 2));
+                var amountStr = data[i]['amount'];
+                var amountArr = amountStr.split(' ');
 
-                if(err) {
-                    console.log("ERR: " + err);
-                    return sendMessage(res, "Could not find any recipes from pantry items...", data_recipe_ids, "Get all possible recipes based on ingredients from user's pantry.");
+                var j;
+                var unitsNdx;
+                for(j = 0; j < amountArr.length; j++) {
+                    unitsNdx = findInArray(units, amountArr[j]);
+                    if(unitsNdx >= 0) {
+                        break;
+                    }
                 }
+
+                if(j >= amountArr.length - 1)
+                    continue;
+
+                var parsed;
+
+                // check if fraction
+                if(findInArray(amountArr[j+1], '/') >= 0) {
+                    parsed = eval(amountArr[j+1]);
+                }
+                // else if not fraction but is a numeric value
+                else if(!isNaN(parseFloat(amountArr[j+1])) && isFinite(amountArr[j+1])) {
+                    parsed = parseFloat(amountArr[j+1]);                        
+                }
+                // else if NaN
                 else {
-                    console.log("RETURNING OUTPUT");
-                    return sendMessage(res, "Success!", tasks, "Get recipe based on ingredients in pantry");
+                    console.log("NaN!!");
+                    continue;
                 }
 
-
-            });
-
-        }
-
-        function getExtractor(i, output) {
-
-            return function(callback) {
-
-                console.log("input recipes: " + i);
-
-                var queryText3 = squel.select()
-                        .from("recipes")
-                        .where("id = " + i)
-                        .toString();
-                console.log(queryText);
-
-                var queryDB3 = require('../database')(queryText3, function(mssg, data_to_push) {        
-                    
-                    for(var j = 0; j < data_to_push.length; j++) {
-                        addIngredients(j, data_to_push[j]['id'], data_to_push[0], callback);
-                    }
-                });
+                var gramVal = convertToGrams(parsed, unitsNdx)/100;
+                updateTotals(res, totals, gramVal, data, i);
             }
 
-            function addIngredients(ndx, id, data_to_push, callback) {
-
-                console.log("adding ingredients ++ id = " + id);
-                var queryText4 = squel.select()
-                                    .field("ingredient_id, name")
-                                    .from("recipe_ingredients, ingredients")
-                                    .where("recipe_ID = " + id)
-                                    .where("ingredient_id = nbd_num")
-                                    .toString();
-
-                var queryDB4 = require('../database')(queryText4, function(mssg, data_to_push2) {        
-
-                    data_to_push['ingredients'] = [];
-
-                    for(var k = 0; k < data_to_push2.length; k++) {
-                        data_to_push['ingredients'].push(data_to_push2[k]);
-                    }
-                    
-                    return callback(null, data_to_push);
-                });
-            }
+            sendMessage(res, 200, mssg, totals, "Generate nutrition facts for recipe");
         }
 
-        function callback(mssg) {
-            console.log("Call back mssg: " + mssg);
+        function updateTotals(res, totals, gramVal, data, i) {
+
+            // nutrient content: V = (N * CM)/100; pg 44
+            // grams
+            totals['serving_size']      += gramVal;
+            totals['kcals']             += (parseFloat(data[i]['kcals']) * gramVal)/100;
+            totals['protein']           += (parseFloat(data[i]['protein']) * gramVal)/100; 
+            totals['fat']               += (parseFloat(data[i]['fat']) * gramVal)/100;
+            totals['carbohydrates']     += (parseFloat(data[i]['carbohydrates']) * gramVal)/100;   
+
+            // daily % value             
+            totals['fiber']             += (parseFloat(data[i]['fiber']) * gramVal);
+            totals['calcium']           += (parseFloat(data[i]['calcium']) * gramVal);
+            totals['iron']              += (parseFloat(data[i]['iron']) * gramVal);
+            totals['magnesium']         += (parseFloat(data[i]['magnesium']) * gramVal);
+            totals['phosphorous']       += (parseFloat(data[i]['phosphorous']) * gramVal);
+            totals['potassium']         += (parseFloat(data[i]['potassium']) * gramVal);
+            totals['sodium']            += (parseFloat(data[i]['sodium']) * gramVal);
+            totals['zinc']              += (parseFloat(data[i]['zinc']) * gramVal);
+            totals['copper']            += (parseFloat(data[i]['copper'])  * gramVal);
+            totals['manganese']         += (parseFloat(data[i]['manganese']) * gramVal);
+            totals['selenium']          += (parseFloat(data[i]['selenium']) * gramVal);
+            totals['vitc']              += (parseFloat(data[i]['vitc']) * gramVal);
+            totals['thiamin']           += (parseFloat(data[i]['thiamin']) * gramVal);
+            totals['riboflavin']        += (parseFloat(data[i]['riboflavin']) * gramVal);
+            totals['niacin']            += (parseFloat(data[i]['niacin']) * gramVal);
+            totals['pantothenic_acid']  += (parseFloat(data[i]['pantothenic_acid']) * gramVal);
+            totals['vitb6']             += (parseFloat(data[i]['vitb6']) * gramVal);
+            totals['folate']            += (parseFloat(data[i]['folate']) * gramVal);
+            totals['choline']           += (parseFloat(data[i]['choline']) * gramVal);
+            totals['vitb12']            += (parseFloat(data[i]['vitb12']) * gramVal);
+            totals['vita']              += (parseFloat(data[i]['vita']) * gramVal);
+            totals['vite']              += (parseFloat(data[i]['vite']) * gramVal);
+            totals['vitd']              += (parseFloat(data[i]['vitd']) * gramVal);
+            totals['vitk']              += (parseFloat(data[i]['vitk']) * gramVal);
+            totals['cholesterol']       += (parseFloat(data[i]['cholesterol']) * gramVal);
+        }
+
+        function convertToGrams(parsed, unitsNdx) {
+
+            var gramVal;
+
+            // cup
+            if(unitsNdx == 0) {
+                gramVal = parsed * 236.58824;
+            }
+            // teaspoon
+            else if(unitsNdx == 1) {
+                gramVal = parsed * 5;
+            }
+            // tablespoon
+            else if(unitsNdx == 2) {
+                gramVal = parsed * 15; 
+            }
+            // cubic inch
+            else if(unitsNdx == 3) {
+                gramVal = parsed * parsed * parsed * 16.3870640693;
+            }
+            // ounce
+            else if(unitsNdx == 4 || unitsNdx == 5) {
+                gramVal = parsed * 28.3495;
+            }
+            // pound mass
+            else if(unitsNdx == 6 || unitsNdx == 7) {
+                gramVal = parsed * 453.592;
+            }
+            // pint
+            else if(unitsNdx == 8) {
+                gramVal = parsed * 473.1764750005525;
+            }
+
+            // more to add if i find more in recipe_inredients table
+
+            return gramVal;
+        }
+
+        function findInArray(arr, word) {
+            return arr.indexOf(word);
         }
     };
 
-    function sendMessage(res, mssg, mRows, requestType) {
+    function sendMessage(res, status, mssg, mRows, requestType) {
 
         var response = {};
 
+        response['status'] = status;
         response['result'] = mssg;
         response['requestType'] = requestType;
         response['data'] = mRows;
-
-        if(mssg == "Problem querying database...")
-            response['status'] = 400;
-        else
-            response['status'] = 200;
 
         res.set("Access-Control-Allow-Origin", "*");
         res.json(response);
     }
 
     return {
-        insert: insert,
         generatePossibleRecipesFromPantry: generatePossibleRecipesFromPantry,
-        getRecipeByID: getRecipeByID
+        getRecipeByID: getRecipeByID,
+        generateNutritionFacts: generateNutritionFacts
     };
 
 }();
