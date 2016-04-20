@@ -3,10 +3,12 @@
 Set up:
 
 (1) Clone repo into a local folder. Make sure to have Node installed.
+
 (2) Open up a terminal in that folder. Install project with:
 ```javascript
 npm install
 ```
+
 (3) Edit db_config.json with information to access your database:
 ```json
 {
@@ -45,7 +47,7 @@ I return a JSON object with the same keys for **all** requests. It looks like th
   }
 }
 
-- The `data` key represents the state of the call. `200` means success. `400` means failure. 
+- The `status` key represents the state of the call. `200` means success. `400` means failure. 
 - The `result` key contains a message about the result of the query. It'll say a variety of things like "Query successful" or "Insert into pantry successful" or "Cannot find ingredient with the specified id". 
 - The `requestType` key contains the type of request you sent.
 - The `data` key contains data returned to you if you did a GET request.
@@ -66,5 +68,16 @@ Here are the routes that I finished and I have tested with the remote database. 
 `/recipes/getRecipe/params` -- get recipe by ID. Works.
 
 `/recipes/getPossibleRecipes/params`-- Generate ingredients that, when added to the pantry, will allow for more recipes. See comments in `recipeRouter.js`
+
+`/pantry/getPantry/params` -- Get ingredients in the user's pantry.
+
+`/pantry/addIngredientToPantry/params` -- Works! This call does multiple things:
+
+ 1. inserts a new ingredient to the user's pantry
+ 2. updates the amount for that ingredient if the user already has that ingredient, but in a different amount
+ 3. creates a new pantry with a unique pantry_id for new users if the user does not have a pantry already (this happens when the user first signs up and does not have any ingredients in the pantry, and thus no rows in the "pantries" table OR when the user deletes all ingredients in the pantry.
+
+`pantry/deleteIngredient/params` -- removes ingredient from user's pantry.
+
 
 More info on these calls in the appropriate `%router.js` file in the \router folder.

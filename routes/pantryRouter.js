@@ -16,103 +16,64 @@ router.route('/pantry')
         res.send("You didn't specify any arguments!<br>Here are some which are currently supported:<br><br>" + 
                 "pantry/params<br><br>" +
                 "Parameters are:<br/>" + 
-                "pantryID -- pantry id<br/>" +
-                "pantryName -- pantry name<br/>" +
-                "ownerName -- name of owner<br/>" +
-                "ingredientID -- ingredients inside pantry<br/>" + 
-                "ingredientAmount -- amount of the ingredient<br/>" +
-                "ingredientToAdd -- ingredient_id to add<br/>"
+                "pantry_id -- pantry id<br/>" +
+                "pantry_name -- pantry name<br/>" +
+                "owner_name -- name of owner<br/>" +
+                "ingredient_id -- ingredients inside pantry<br/>" + 
+                "amount -- amount of the ingredient<br/>"
         );
     });
 
 /**
-    Retrieve pantry.
+    WORKS -- I TESTED W/ REMOTE DB
 
-    Params: pantryID, ownerName
+    Retrieve pantry by owner_name
+
+    Params: owner_name
 
     ex:
-    (1) http://localhost:8080/api/pantry/params?ownerName=alien3&pantryID=3
+    (1) http://localhost:8080/api/pantry/params?owner_name=alien1
 */
 router.route('/pantry/getPantry/params')
     .get(function(req, res) {
 
-        var pantry = new Pantry(
-                        req.query.pantryID,
-                        null,
-                        req.query.ownerName,
-                        null);
-
-        pantryFuncs.getFromPantry(pantry, res);
-    })
-
-/**
-
-    DO NOT USE. TO FIX.
-
-
-    Insert a new pantry. Only use when you really NEED to
-    insert a new pantry for some reason. 
-
-    User sign-up automatically
-    creates a new pantry, so don't call it twice.
-
-    Params: pantryID, pantryName, ownerName, ingredientID, ingredientAmount
-
-    ex: http://localhost:8080/api/pantry/params?pantryID=1&pantryName=newName&ownerName=ex1
-*/
-router.route('/pantry/insertNewPantry/params')
-    .post(function(req, res) {
-
-        var pantry = new Pantry(
-                            req.query.pantryID,
-                            req.query.pantryName,
-                            req.query.ownerName,
-                            req.query.contents );
-
-        pantryFuncs.insertIntoPantry(pantry, res);
-    })
+        pantryFuncs.getPantry(req.query.owner_name, res);
+    });
 
 /*
+
+    WORKS -- I TESTED W/ REMOTE DB
+
     Insert ingredient into user pantry
 
-    Params: pantryID, pantryName, ownerName, ingredientID, amount
+    Params: owner_name, ingredient_id, amount
 
-    http://localhost:8080/api/pantry/addIngredientToPantry/params?pantryName=New Pantry&ownerName=ex1&pantryID=4&toAdd=Cheese
+    http://localhost:8080/api/pantry/addIngredientToPantry/params?owner_name=Martha&ingredient_id=10000&amount=59
 */
 router.route('/pantry/addIngredientToPantry/params')
     .post(function(req, res) {
 
-        var userName = req.query.ownerName;
-        var pantryID = req.query.pantryID;
-        var pantryName = req.query.pantryName;
-        var ingredientToAdd = req.query.ingredientID;
+        var userName = req.query.owner_name;
+        var ingredientToAdd = req.query.ingredient_id;
         var amount = req.query.amount;
 
-        console.log("to add: ", ingredientToAdd);
+        pantryFuncs.addIngredientToPantry(userName, ingredientToAdd, amount, res);
+    });
 
-        // check if ingredient already exists
-        var mRows = [];
-        var existsText = squel.select()
-                                .from("pantries")
-                                .where("ingredient_id = ?", ingredientToAdd)
-                                .where("owner_name = ?", userName)
-                                .toString();
-        console.log(existsText);
+/**
+    WORKS -- I TESTED ON REMOTE DB
 
-        var queryDB = require('../database')(existsText, function(mssg, data) {
+    Delete ingredients from user pantry
 
-            console.log("data: " + data);
+    Params: owner_name, ingredient_id
 
-            // if ingredient not in pantry, add it
-            if(mRows.length === 0) {
-                var pantry = new Pantry(pantryID, pantryName, userName, ingredientToAdd, amount);
-                pantryFuncs.insertIntoPantry(pantry, res);
-            }
-            // ingredient already in pantry, 
-            else {
-                return res.json({"message": "Ingredient already exists...", "queryType": "Insert into pantry", "data": data});
-            }
-        });
+    http://localhost:8080/api/pantry/deleteIngredient/params?owner_name=Martha&ingredient_id=10000
+*/
+router.route('/pantry/deleteIngredient/params')
+    .post(function(req, res) {
+
+        pantryFuncs.deleteIngredientFromPantry(req.query.owner_name, 
+            req.query.ingredient_id, res);
     });
 
 module.exports = router;
