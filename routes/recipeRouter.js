@@ -34,6 +34,8 @@ router.route('/recipes')
     Does not calculate possible recipes based on amounts.
 
     Params: user_name
+
+    http://localhost:8080/api/recipes/generatePossibleRecipesFromPantry/params?user_name=Martha
 */
 router.route('/recipes/generatePossibleRecipesFromPantry/params')
 
@@ -54,7 +56,7 @@ router.route('/recipes/generatePossibleRecipesFromPantry/params')
     Params: id
 
     ex:
-    (1) http://localhost:8080/api/generateNutritionFacts/params?id=10000
+    (1) http://localhost:8080/api/recipes/generateNutritionFacts/params?id=10000
 */
 router.route('/recipes/generateNutritionFacts/params')
     .get(function(req, res) {
@@ -70,7 +72,7 @@ router.route('/recipes/generateNutritionFacts/params')
     Params: id
 
     ex:
-    (1) http://localhost:8080/api/getRecipe/params?id=1
+    (1) http://localhost:8080/api/recipes/getRecipe/params?id=1
 */
 router.route('/recipes/getRecipe/params')
     .get(function(req, res) {
@@ -88,7 +90,7 @@ router.route('/recipes/getRecipe/params')
     Params: user_name
 
     ex: 
-    (1) http://localhost:8080/api/getPossibleRecipes/params?user_name=10000
+    (1) http://localhost:8080/api/recipes/getPossibleRecipes/params?user_name=10000
 
     Returns: 
 
@@ -133,5 +135,10 @@ router.route('/recipes/getPossibleRecipes/params')
         recipeFuncs.getPossibleRecipes(req.query.user_name, res);
     });
 
+router.route('/recipes/getPossibleRecipesCombinedWithFriendsPantry/params')
+    .get(function(req, res) {
+
+        recipeFuncs.getPossibleRecipesCombinedWithFriendsPantry(req.query.user_name, req.query.friend_name, res);
+    });
 
 module.exports = router;

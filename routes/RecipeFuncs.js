@@ -293,10 +293,34 @@ var RecipeFuncs = function() {
                     return parseInt(a['ingredients_needed_count']) - parseInt(b['ingredients_needed_count']);
                 });
 
-                sendMessage(res, 200, mssg, formatted.slice(0,50), "Get ingredients that, when added, will allow for more recipes");
+                sendMessage(res, 200, mssg, formatted.slice(0,100), "Get ingredients that, when added, will allow for more recipes");
             });
         }
-    }
+    };
+
+    var getPossibleRecipesCombinedWithFriendsPantry = function(user_name, friend_name, res) {
+
+        var queryText = 
+                "SELECT * " +
+                "FROM recipes " +
+                "WHERE id IN (" +
+                    "SELECT recipe_id as id " +
+                    "FROM pantries, recipe_ingredients " +
+                    "WHERE (recipe_ingredients.ingredient_id = pantries.ingredient_id) AND " + 
+                    "(owner_name=\'" + user_name + "\' OR owner_name=\'" + friend_name + "\')" +
+                ");"
+
+        var queryDB = require('../database')(queryText, function(mssg, data) {
+            //console.log(JSON.stringify(data, null, 2));
+
+            if(data == null || data.length < 1) {
+                sendMessage(res, 400, "Failed", data, "get possible recipes combining two pantries");
+            }
+            else{
+                sendMessage(res, 200, mssg, data, "get possible recipes combining two pantries");
+            }
+        });
+    };
 
 
     function sendMessage(res, status, mssg, mRows, requestType) {
@@ -316,7 +340,8 @@ var RecipeFuncs = function() {
         generatePossibleRecipesFromPantry: generatePossibleRecipesFromPantry,
         getRecipeByID: getRecipeByID,
         generateNutritionFacts: generateNutritionFacts,
-        getPossibleRecipes: getPossibleRecipes
+        getPossibleRecipes: getPossibleRecipes,
+        getPossibleRecipesCombinedWithFriendsPantry: getPossibleRecipesCombinedWithFriendsPantry
     };
 
 }();

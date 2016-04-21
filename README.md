@@ -75,9 +75,18 @@ Here are the routes that I finished and I have tested with the remote database. 
 
  1. inserts a new ingredient to the user's pantry
  2. updates the amount for that ingredient if the user already has that ingredient, but in a different amount
- 3. creates a new pantry with a unique pantry_id for new users if the user does not have a pantry already (this happens when the user first signs up and does not have any ingredients in the pantry, and thus no rows in the "pantries" table OR when the user deletes all ingredients in the pantry.
+ 3. creates a new pantry with a unique pantry_id for new users if the user does not have a pantry already (this happens when the user first signs up and does not have any ingredients in the pantry, and thus no rows in the "pantries" table OR when the user deletes all ingredients in the pantry).
 
 `pantry/deleteIngredient/params` -- removes ingredient from user's pantry.
+
+`/auth/signup/params` -- sign up a new user. No password yet...
+
+`/auth/insertNewFriend/params` -- add a new friend. Adding a new friend is not mutual.
+
+`/auth/deleteFriend/params` -- delete a friend.
+
+`/recipes/getPossibleRecipesCombinedWithFriendsPantry/params`-- merge 2 pantries together to get even more possible recipes. Useful if you want 2 users to put their ingredients together to see what they can make together.
+
 
 
 More info on these calls in the appropriate `%router.js` file in the \router folder.
