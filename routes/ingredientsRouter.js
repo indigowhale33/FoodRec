@@ -29,6 +29,10 @@ router.route('/ingredients/getAll')
     });
 
 
+
+
+
+
 /*
     WORKS -- I TESTED w/ REMOTE DB
 
@@ -46,6 +50,11 @@ router.route('/ingredients/getIngredientBySubstring/params')
 
         ingredientFuncs.getIngredientBySubstring(req.query.substring, res);
     })
+
+router.route('/ingredients/getAllName')
+    .get(function(req, res) {
+        ingredientFuncs.getAllName(res);
+    });
 
 
 /*

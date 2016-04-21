@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Sidebar - Start Bootstrap Template</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+    <link href="css/searchbar.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+
+</head>
+
+<body>
+    
+
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+            
+          <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle</a>
+          <p id="maintitle">Group 6 Food Recommendation App</p>
+          <a href="/logout" id="username"><%= user_name%></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          
+          <ul class="nav navbar-nav navbar-right">
+            <div id = "daname"></div>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                    <div id="the-basics">
+  <div id="basics">
+  <input id="ingredient-input" class="typeahead" type="text" placeholder="Add Ingredients">
+
+  <!-- <button type="submit" class="searchbtn"><i class="icon-search"></i></button> -->
+    </div>
+                
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+
+                <div id="label-container"></div>
+                
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div id="row1" class="row">
+                        <p><%= dat%></p>
+                </div>
+                <div id="row2" class="row">
+
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+    
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-tagsinput/1.3.6/jquery.tagsinput.min.js"></script>
+    
+
+    <script type="text/javascript">
+        var importrecipes = function(userid){
+
+            //$( "#row1.row" ).append( "<p>"+userid+"</p>" );
+            //console.log(userid);
+        }
+       
+        $( document ).ready(function() {
+            user_name = document.getElementById("username").innerHTML;
+            importrecipes(user_name);
+        });
+    </script>
+    
+
+    <script>
+    
+        
+
+        var substringMatcher = function(strs) {
+          return function findMatches(q, cb) {
+            var matches, substringRegex;
+
+            // an array that will be populated with substring matches
+            matches = [];
+
+            // regex used to determine if a string contains the substring `q`
+            substrRegex = new RegExp(q, 'i');
+
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $.each(strs, function(i, str) {
+              if (substrRegex.test(str)) {
+                matches.push(str);
+              }
+            });
+
+            cb(matches);
+          };
+        };
+
+        var searchingred = [];
+        var basket= [];
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://localhost:8080/api/ingredients/getAllName",false);
+        xhttp.send();
+        var statesdat = (JSON.parse(xhttp.responseText)).data
+        for(var i = 0; i < statesdat.length; i++){
+            searchingred.push(statesdat[i].name);
+        }
+
+
+
+        $('#the-basics .typeahead').typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 1
+        },
+        {
+          name: 'searchingred',
+          source: substringMatcher(searchingred),
+          limit: 50
+        });
+
+
+    </script>
+
+    <script>
+
+    $('#the-basics').on('keydown', function(e) {
+        if(e.which == 13) {
+            if(searchingred.indexOf(document.getElementById("ingredient-input").value) != -1 && basket.indexOf(document.getElementById("ingredient-input").value) == -1){
+                $("#label-container").append(" <span id=\"ingred\" class=\"tag label label-info data-role=\"tagsinput\">"+ document.getElementById("ingredient-input").value +"<a><i class=\"remove glyphicon glyphicon-remove-sign glyphicon-white\"></i></a></span>");    
+                basket.push(document.getElementById("ingredient-input").value);
+                
+            }
+            
+            // $(".tt-suggestion:first-child", this).trigger('click');
+        }
+        //alert("hi");
+    });
+    $(document).ready(function(e){
+        $(document).on("click", "#ingred", function(){
+       $(this).parent('span').remove();
+
+    });
+    });
+
+    $('#label-container').on('click', 'span', function(e){  
+        var index = basket.indexOf(this.textContent);
+        if (index > -1) {
+            basket.splice(index, 1);
+        }
+      $(this).closest('span').remove();
+
+      addRecipe2();
+      console.log(basket);
+    });
+
+
+    function addRecipe(){
+        $( "#row1.row" ).append( "<p>Test</p>" );
+    }
+
+    function addRecipe2(){
+        $( "#row2.row" ).append( "<p>Test2</p>" );
+    }
+</script>
+    
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
+
+</html>

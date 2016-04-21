@@ -2,6 +2,22 @@ var squel = require("squel");
 
 var PantryFuncs = function() {
 
+    var getAllName = function(res) {
+
+        var queryText = squel.select()
+                            .field("name")
+                            .from("ingredients")
+                            .toString();
+        
+        var dbQuery = require('../database')(queryText, function(mssg, data) {
+
+            if(data == null || data.length < 1)
+                sendMessage(res, 400, "No ingredients in ingredients table", data, "Get all ingredients name");
+            else
+                sendMessage(res, 200, mssg, data, "Get all ingredients name");
+        });
+    };
+
     var getAllIngredients = function(res) {
 
         var queryText = squel.select()
@@ -18,6 +34,8 @@ var PantryFuncs = function() {
                 sendMessage(res, 200, mssg, data, "Get all ingredients");
         });
     };
+
+    
 
     var getIngredientByParams = function(input, res) {
 
@@ -91,6 +109,7 @@ var PantryFuncs = function() {
 
     return {
         getAllIngredients: getAllIngredients,
+        getAllName: getAllName,
         getIngredientByParams: getIngredientByParams,
         getIngredientBySubstring: getIngredientBySubstring
     };

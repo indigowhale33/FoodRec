@@ -1,0 +1,142 @@
+[33m[nodemon] 1.9.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching: *.*[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:16:40
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+{ status: 200,
+  result: 'Query successful!',
+  requestType: 'Get recipe by ID',
+  data: 
+   [ { recipe_name: 'Applesauce Pumpkin Bread',
+       ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+       url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+       image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+       date_published: '1365277227498',
+       cook_time: '01:00:00',
+       source: 'allrecipes',
+       recipe_yield: 2,
+       id: 10000,
+       prep_time: '00:00:00',
+       description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' } ] }
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:17:19
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+[ { recipe_name: 'Applesauce Pumpkin Bread',
+    ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+    url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+    image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+    date_published: '1365277227498',
+    cook_time: '01:00:00',
+    source: 'allrecipes',
+    recipe_yield: 2,
+    id: 10000,
+    prep_time: '00:00:00',
+    description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' } ]
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:18:22
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+{ recipe_name: 'Applesauce Pumpkin Bread',
+  ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+  url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+  image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+  date_published: '1365277227498',
+  cook_time: '01:00:00',
+  source: 'allrecipes',
+  recipe_yield: 2,
+  id: 10000,
+  prep_time: '00:00:00',
+  description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' }
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:18:38
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+{ recipe_name: 'Applesauce Pumpkin Bread',
+  ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+  url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+  image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+  date_published: '1365277227498',
+  cook_time: '01:00:00',
+  source: 'allrecipes',
+  recipe_yield: 2,
+  id: 10000,
+  prep_time: '00:00:00',
+  description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' }
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+{ recipe_name: 'Applesauce Pumpkin Bread',
+  ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+  url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+  image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+  date_published: '1365277227498',
+  cook_time: '01:00:00',
+  source: 'allrecipes',
+  recipe_yield: 2,
+  id: 10000,
+  prep_time: '00:00:00',
+  description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' }
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:19:14
+queryText:  SELECT * FROM recipes WHERE (id = '10000')
+Querying database...
+Done. waiting for next query...
+hmm
+{ recipe_name: 'Applesauce Pumpkin Bread',
+  ingredients: '[\'2 cups white sugar\', \'1 1/2 cups applesauce\', \'2 cups pumpkin puree\', \'4 eggs, beaten\', \'2 teaspoons baking powder\', \'2 teaspoons baking soda\', \'2 teaspoons ground cinnamon\', \'1 teaspoon salt\', \'1/2 teaspoon ground ginger\', \'1/2 teaspoon ground cloves\', \'1/4 teaspoon ground mace\', \'1/2 cup chopped walnuts  (optional)\', \'1/2 cup semisweet chocolate chips  (optional)\', \'3 cups all-purpose flour\', "1/4 cup confectioners\' sugar"]',
+  url: 'http://allrecipes.com/Recipe/-Applesauce-Pumpkin-Bread/Detail.aspx',
+  image: 'http://images.media-allrecipes.com/userphotos/250x250/00/96/81/968106.jpg',
+  date_published: '1365277227498',
+  cook_time: '01:00:00',
+  source: 'allrecipes',
+  recipe_yield: 2,
+  id: 10000,
+  prep_time: '00:00:00',
+  description: 'This yummy family tradition started when buying the kids their pumpkins. Each of the kids got one to make their jack o\'lanterns. Mama got one to cook! Friends and family usually enjoy this treat. Tweak it to fit your family as I do mine! Enjoy with confectioners\' sugar on top or cream cheese frosting!\\"Made half the recipe and used half splenda. Turned out perfectly as muffins. Pumpkn pie lke spice flavor and moist, not gooey.This was a hit! Moist and light, with a sweet and spicy flavor :) I left out the mace, chocolate, and confectioners\' sugar, and used a 2 quart baking dish (9 x 13 inch pan).Delicious, moist and didn\'t last!!! I ended up making 3 batches because it never would have made it to our Easter gathering. I thought I would try this for a change from pumpkin pie this Easter. Everyone Loved it. I wasn\'t sure at first about adding the semisweet chips but my daughter insisted and the little hint of chips was prefect. I left out the walnuts. I didn\'t have any ginger, clove or mace in the cupboard so I substituted for 2tsp of pumpkin pie spice. I am going to make it again this weekend for an other dinner gathering.This was very easy and very good.  I followed the recipe, except that I did not have mace but instead used 1/4 teaspoon nutmeg and 1/4 teaspoon allspice.  I added the optional chocolate chips but next time I would probably leave those out, just my personal preference.  By all means give this recipe a try.  The measurements and cooking time were spot on.  Thanks Virginia Ann for sharing your recipe."}\n' }
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:39:47
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:39:52
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:40:26
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:41:33
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:41:34
+[33m[nodemon] 1.9.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching: *.*[39m
+[32m[nodemon] starting `node server.js`[39m
+Listening on port 8080...
+Server time: 2016:04:21:06:41:44
