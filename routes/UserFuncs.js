@@ -2,11 +2,11 @@ var squel = require("squel");
 var Pantry  = require('../models/pantry');
 var pantryFuncs = require('./PantryFuncs');
 var User = require('../models/user');
+var session = require('client-sessions');
 
 var UserFuncs = function() {
 
-    var login = function(user, res) {
-
+    var login = function(user, req, res) {
         var queryText = squel.select()
                             .from("users")
                             .where("user_name = ?", user.userName)
@@ -14,10 +14,18 @@ var UserFuncs = function() {
         console.log("queryText: " + queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) { 
-            sendMessage(res, mssg, data, "Log in");
+
+            if(data.length > 0){
+                req.session.user = data[0];
+                console.log(data);
+                res.redirect('/main');
+            }else{
+                res.send("Log-in Failure(No/incorrect user info)");
+            }
+            //sendMessage(res, mssg, data, "Log in");
         });
 
-        return;
+        //return;
     }
 
     var signup = function(newuser, res) {
