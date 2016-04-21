@@ -7,11 +7,13 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "body-parser": "*",
+    "client-sessions": "^0.7.0",
     "cookie-parser": "*",
+    "ejs": "^2.4.1",
     "express": "*",
     "pg": "*",
-    "squel": "*",
-    "async": "*"
+    "squel": "*"
   }
 }

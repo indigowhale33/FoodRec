@@ -43,10 +43,9 @@ router.route('/auth/updateFriends/params')
     (1) http://localhost:8080/api/auth/login/params?userName=ex1
 */
 router.route('/auth/login/params')
-    .get(function(req, res) {
-
-        var user = new User(req.query.userName, null);
-        userFuncs.login(user, res);
+    .post(function(req, res) {
+        var user = new User(req.body.userName, null);
+        userFuncs.login(user, req, res);
     });
 
 /**
