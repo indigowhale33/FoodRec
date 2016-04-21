@@ -6,16 +6,18 @@ var session = require('client-sessions');
 
 var UserFuncs = function() {
 
-    var login = function(user, req, res) {
+    var login = function(userName, req, res) {
         var queryText = squel.select()
                             .from("users")
-                            .where("user_name = ?", user.userName)
+                            .where("user_name = ?", userName)
                             .toString();
-        console.log("queryText: " + queryText);
 
         var queryDB = require('../database')(queryText, function(mssg, data) { 
 
+            console.log(data);
+
             if(data.length > 0){
+                console.log("data[0]: " + data[0]);
                 req.session.user = data[0];
                 console.log(data);
                 res.redirect('/main');
@@ -24,156 +26,120 @@ var UserFuncs = function() {
             }
             //sendMessage(res, mssg, data, "Log in");
         });
+    };
 
-        //return;
-    }
+    var signup = function(userName, res) {
 
-    var signup = function(newuser, res) {
+        var addNewUserQuery = squel.insert()
+                                    .into("users")
+                                    .set("user_name", userName)
+                                    .toString();
+        
+        var queryDB = require('../database')(addNewUserQuery, function(mssg, data) {
 
-        var queryText = squel.select()
-                            .from("pantries")
-                            .field("MAX(pantry_id)")
-                            .toString();
-        console.log("query: ", queryText);
-
-        var queryDB = require('../database')(queryText, function(mssg, data) {
-            next(data, res);
+            if(mssg == "Problem querying database") {
+               sendMessage(res, 400, "User already exists or problem querying database", "sign up", data);
+            }
+            else {
+                sendMessage(res, 200, "Sign up successful", "sign up", data);
+            }
         });
-
-        function next(row, res) {
-                
-            var maxPantryID = row[0]['max'];
-            console.log('max: ' + maxPantryID);
-
-            if(maxPantryID == null || maxPantryID == 'undefined')
-                maxPantryID = 1;
-
-            newuser.pantryID = parseInt(maxPantryID) + 1;
-            addNewUser(newuser, res);
-        }
-
-        function addNewUser(newuser, res) {
-            
-            var addNewUserQuery = squel.insert()
-                                        .into("users")
-                                        .set("user_name", newuser.userName)
-                                        .set("friends", newuser.friendName)
-                                        .toString();
-            console.log("query text: " + addNewUserQuery);
-            
-            var queryDB = require('../database')(addNewUserQuery, function(mssg, data) {
-
-                if(mssg == "Problem querying database") {
-                   
-                   
-                   /*
-                        USER ALREADY EXISTS
-                    */
-                }
-                else {
-                    addNewPantry(newuser, res);
-                }
-            });
-        }
-
-        function addNewPantry(newuser, res) {
-
-            console.log("" + newuser.userName + "'s Pantry");
-            var pantry = new Pantry(newuser.pantryID, newuser.userName + '\'\'s Pantry', newuser.userName, '');
-            var queryText = squel.insert()
-                                .into("pantries")
-                                .set("pantry_id", pantry.id)
-                                .set("pantry_name", pantry.name)
-                                .set("owner_name", pantry.owner)
-                                .toString();
-            console.log("query text: " + queryText);
-
-            var queryDB = require('../database')(queryText, function(mssg, data) {
-                sendMessage(res, mssg, data, "User signup");
-            });
-        }
-    }
+    };
 
     /**
-        Update friends.
-
-        To update friends: 
-        (2) Update the friend's "friends" column
+        Insert new friend. Does not insert mutually for both people, only for
+        one person.
     */
-    var updateFriends = function(user, res) {
+    var insertNewFriend = function(userName, newFriend, res) {
+
+        checkUserExists(userName, function(mssg, data) {
+
+            if(data == null || data.length < 1) {
+                sendMessage(res, 400, "User " + userName + " does not exist", "add friend", data);
+            }
+            else {
+                startInsertingNewFriend(userName, newFriend, res);
+            }
+
+        });
+    };
+
+    function startInsertingNewFriend(userName, newFriend, res) {
 
         var queryText = squel.select()
-                            .field("friends")
-                            .from("users")
-                            .where("user_name = ?", user.userName)
+                            .from("friends")
+                            .where("username_1 = ?", userName)
+                            .where("username_2 = ?", newFriend)
                             .toString();
-        console.log(queryText);
-
-        console.log("new friend " + user.newFriend);
 
         var DBquery = require('../database')(queryText, function(mssg, data) {
 
-            var friendsStr = data[0];
-            if(friendsStr == null) {
-                return;
+            console.log(JSON.stringify(data, null, 2));
+
+            if(data == null || data.length < 1) {
+                insertPair(userName, newFriend, res);
             }
+            else {
+                sendMessage(res, 400, "User " + userName + " and " + newFriend + " are already friends.", "add friend", data);
+            }
+        });
 
-            var friendsList = friendsStr['friends'];
-            if(friendsList == null)
-                friendsList = '';
+        function insertPair(userName, newFriend, res) {
 
-            var friendsArr = friendsList.split(' ');
+            var pairQuery = 
+                    "INSERT " + 
+                    "INTO friends " +
+                    "VALUES(\'" + userName + "\',\'" + newFriend + "\');";
 
-            for(var i = 0; i < friendsArr.length; i++) {
-                if(friendsArr[i] === user.newFriend) {
-                    res.status(200).json({"message": "Friend already exists for user " + user.userName, "status": 400, "requestType": "Update friends", "data": null});
-                    return;
+            var DBQuery2 = require('../database')(pairQuery, function(mssg, data) {
+
+                if(mssg == "Problem querying database") {
+                    sendMessage(res, 400, "Problem inserting into friends table", "add friend", data);
                 }
-            }
+                else {
+                    sendMessage(res, 200, mssg, "Add friend", data);
+                }
+            });
+        }
+    }
 
-            friendsList += user.newFriend +' ';
-            console.log("friendsList: " + friendsList);
+    function checkUserExists(userName, callback) {
 
-            user.friendName = friendsList;
-            changeFriends(user, res);
+        var queryText = squel.select()
+                            .from("users")
+                            .where("user_name = ?", userName)
+                            .toString();
+
+        var queryDB = require('../database')(queryText, function(mssg, data) {
+            callback(mssg, data);
         });
     }
 
-    var changeFriends = function(user, res) {
+    var deleteFriend = function(userName, friendName, res) {
 
-        if(user.friendName == null)
-            return;
-
-        console.log(user.userName);
-        console.log(user.friendName);
-
-        var queryText = squel.update()
-                            .table("users")
-                            .set("friends", user.friendName)
-                            .where("user_name = ?", user.userName)
+        var queryText = squel.delete()
+                            .from("friends")
+                            .where("username_1 = ?", userName)
+                            .where("username_2 = ?", friendName)
                             .toString();
-        console.log(queryText);
 
         var DBQuery = require('../database')(queryText, function(mssg, data) {
-            sendMessage(res, mssg, data, "Update friends");
+
+            if(mssg == 'Problem querying database')
+                sendMessage(res, 400, "Problem deleting friend", "delete friend", data);
+            else
+                sendMessage(res, 200, "Friends deleted: " + userName + " " + friendName, "delete friend",  data);
         });
+    };
 
-
-        return;
-    }
-
-    function sendMessage(res, mssg, mRows, requestType) {
+    function sendMessage(res, status, mssg, requestType, mRows) {
 
         var response = {};
 
+        response['status'] = status;
         response['result'] = mssg;
         response['requestType'] = requestType;
         response['data'] = mRows;
-
-        if(mssg == "Problem querying database")
-            response['status'] = 400;
-        else
-            response['status'] = 200;
 
         res.set("Access-Control-Allow-Origin", "*");
         res.json(response);
@@ -182,8 +148,8 @@ var UserFuncs = function() {
     return {
         login: login,
         signup: signup,
-        updateFriends: updateFriends,
-        changeFriends: changeFriends
+        insertNewFriend: insertNewFriend,
+        deleteFriend: deleteFriend
     }
 
 }();

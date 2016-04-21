@@ -1,3 +1,9 @@
+/**
+    Note: all parameters in this file have the old parameters because
+    it looks like you already started working with these parameters. I
+    won't change it -- it's too much work.
+*/
+
 var express = require('express');
 var User  = require('../models/user');
 var userFuncs = require('./UserFuncs');
@@ -13,7 +19,8 @@ router.route('/auth')
             "auth/log-in<br/><br/>" +
             "Parameters are:<br/>" +
             "userName -- user name<br/>" + 
-            "friendName -- friend's name<br/>"
+            "friendName -- friend's name<br/>" +
+            "newFriend -- new friend's name<br/>"
         );
     });
 
@@ -25,13 +32,24 @@ router.route('/auth')
     ex:
     (1) http://localhost:8080/api/auth/updateFriends/params?userName=Albert&newFriend=Cindy
 */
-router.route('/auth/updateFriends/params')
+router.route('/auth/insertNewFriend/params')
     .post(function(req, res) {
-        
-        var user = new User(req.query.userName, null);
-        user.newFriend = req.query.newFriend;
 
-        userFuncs.updateFriends(user, res);
+        userFuncs.insertNewFriend(req.query.userName, req.query.newFriend, res);
+    });
+
+/**
+    Delete friend.
+
+    Params: userName, friendName
+
+    ex:
+    (1) http://localhost:8080/api/auth/deleteFriend/params?userName=Albert&friendName=Cindy
+*/
+router.route('/auth/deleteFriend/params')
+    .post(function(req, res) {
+
+        userFuncs.deleteFriend(req.query.userName, req.query.friendName, res);
     });
 
 /*
@@ -44,8 +62,10 @@ router.route('/auth/updateFriends/params')
 */
 router.route('/auth/login/params')
     .post(function(req, res) {
-        var user = new User(req.body.userName, null);
-        userFuncs.login(user, req, res);
+        //var user = new User(req.body.userName, null);
+        
+        userFuncs.login(req.body.userName, req, res);
+        //userFuncs.login(req.body.userName, req, res);
     });
 
 /**
@@ -59,8 +79,7 @@ router.route('/auth/login/params')
 router.route('/auth/signup/params')
     .post(function(req, res) {
 
-        var newuser = new User(req.query.userName, null);
-        userFuncs.signup(newuser, res);
+        userFuncs.signup(req.query.userName, res);
     });
 
 module.exports = router;
