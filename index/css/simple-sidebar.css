@@ -13,6 +13,16 @@
     left: 1%;
 }
 
+div #ingred {
+    display:block;
+    float:left;
+   margin:8px 0 0 6px;
+  font-size: 14px;
+  padding: .3em .4em .4em;
+  border-radius: 6px;
+  
+}
+
 #maintitle{
     position:absolute;
     font-size: 30px;

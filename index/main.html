@@ -77,11 +77,10 @@
         <!-- Page Content -->
         <div id="page-content-wrapper">
             <div class="container-fluid">
-                <div id="row1" class="row">
+                <!-- <div id="row1" class="row">
                         <p><%= dat%></p>
-                </div>
+                </div> -->
                 <div id="row2" class="row">
-
                 </div>
             </div>
         </div>
@@ -137,6 +136,9 @@
           };
         };
 
+        
+
+
         var searchingred = [];
         var basket= [];
         var xhttp = new XMLHttpRequest();
@@ -159,6 +161,27 @@
           source: substringMatcher(searchingred),
           limit: 50
         });
+
+        var getUserPantry = function(){
+            $.get('/api/recipes/generatePossibleRecipesFromPantry/params?user_name='+document.getElementById("username").innerHTML, function(res) {
+                //$('#val').text(res);
+                buildContent(res.data);
+            });
+        }
+
+        var buildContent = function(arrdata){
+            var eachrecipe;
+            for(var i=0; i < arrdata.length; i++){
+                eachrecipe = arrdata[i];
+                console.log(eachrecipe.image);
+                
+                $("#row2.row").append('<div class="col-sm-3" id=\"box\"><div id=\"picture\"><img src=\"' + eachrecipe.image +'\" height="180px" width="180px"/></div><div id=\"text\" style=>hi</div></div>');
+
+            }
+
+        }
+
+        getUserPantry();
 
 
     </script>
