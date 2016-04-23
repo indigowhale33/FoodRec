@@ -4,6 +4,53 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
+.listlink{
+    float:left;
+}
+
+#the-basics{
+    float:left;
+}
+
+
+ .spinner {
+  width: 80px;
+  margin-top: 5px;
+  padding-right: 10px;
+  float:right;
+}
+.spinner input {
+  text-align: right;
+}
+.input-group-btn-vertical {
+  position: relative;
+  white-space: nowrap;
+  width: 1%;
+  vertical-align: middle;
+  display: table-cell;
+}
+.input-group-btn-vertical > .btn {
+  display: block;
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  padding: 8px;
+  margin-left: -1px;
+  position: relative;
+  border-radius: 0;
+}
+.input-group-btn-vertical > .btn:first-child {
+  border-top-right-radius: 4px;
+}
+.input-group-btn-vertical > .btn:last-child {
+  margin-top: -2px;
+  border-bottom-right-radius: 4px;
+}
+.input-group-btn-vertical i{
+  position: absolute;
+  top: 0;
+}
+
 /* Toggle Styles */
 
 #menu-toggle {
@@ -11,6 +58,16 @@
     transition: .5s ease;
     top: 10%;
     left: 1%;
+}
+
+div #ingred {
+    display:block;
+    float:left;
+   margin:8px 0 0 6px;
+  font-size: 14px;
+  padding: .3em .4em .4em;
+  border-radius: 6px;
+  
 }
 
 #maintitle{
@@ -42,22 +99,51 @@
 }
 
 #wrapper.toggled {
-    padding-left: 250px;
+    padding-left: 320px;
 }
 
 #sidebar-wrapper {
+    overflow-y: scroll;
+    float:left;
     z-index: 1000;
     position: fixed;
     left: 250px;
     width: 0;
     height: 100%;
     margin-left: -250px;
-    overflow-y: auto;
     background: #000;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
+}
+
+#box{
+    margin-left: auto;
+    margin-right: auto;
+    height:230px;
+}
+
+#submitUpdate{
+    float:left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width:100%;
+    vertical-align: middle;
+    min-height: 20px;
+}
+
+#submitbox{
+    float: left;
+}
+
+.col-sm-2{
+    margin-top: auto;
+    text-align: center;
+}
+
+#imgtext{
+    font-size: 15px;
 }
 
 #wrapper.toggled #sidebar-wrapper {
@@ -72,23 +158,27 @@
 
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
-    margin-right: -250px;
+    margin-right: -320px;
 }
 
 /* Sidebar Styles */
 
+
+
 .sidebar-nav {
-    position: absolute;
     top: 0;
-    width: 250px;
+    width: 320px;
     margin: 0;
     padding: 0;
     list-style: none;
+    float:left;
 }
 
 .sidebar-nav li {
     text-indent: 20px;
     line-height: 40px;
+    padding-bottom: 30px;
+    
 }
 
 .navbar-static-top {
@@ -132,7 +222,7 @@
 
 @media(min-width:768px) {
     #wrapper {
-        padding-left: 250px;
+        padding-left: 320px;
     }
 
     #wrapper.toggled {
@@ -140,7 +230,7 @@
     }
 
     #sidebar-wrapper {
-        width: 250px;
+        width: 320px;
     }
 
     #wrapper.toggled #sidebar-wrapper {

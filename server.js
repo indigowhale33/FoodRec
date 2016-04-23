@@ -23,6 +23,7 @@ app.use(session({
     secret: 'random_string',
     duration: 30* 60 * 1000,
     activeDuration: 5* 60 * 1000,
+    httpOnly:false
 }));
 app.use('/', express.static(__dirname + '/index'));
 app.set('views', __dirname+ '/index/views');
@@ -46,8 +47,8 @@ app.get('/main', function(req,res){
     var options = {
         host: 'localhost',
         port : 8080,
-        path: '/api/recipes/getRecipe/params?id=10000'
-       // path: '/api/recipes/generatePossibleRecipesFromPantry/params?userName='+req.session.user.user_name
+        //path: '/api/recipes/getRecipe/params?id=10000'
+        path: '/api/recipes/generatePossibleRecipesFromPantry/params?user_name='+req.session.user.user_name
   };
     var myObject = { title:'data', data:'' };
     callback = function(response) {
@@ -59,7 +60,7 @@ app.get('/main', function(req,res){
             //console.log(chunk);
               myObject = chunk;
               console.log("hmm");
-              console.log(JSON.parse(myObject).data[0]);
+              console.log(JSON.parse(myObject));
 
             res.render(__dirname+ '/index/main.html', {user_name: req.session.user.user_name, dat: JSON.stringify((JSON.parse(myObject)).data[0])});
         });

@@ -119,18 +119,18 @@ span.tag {
 
 
 .typeahead {
-
+    float:left;
     position: absolute;
-    margin-left: 8px;
+    margin-left: 16px;
     margin-top: 5px;
     padding: 0 6px 0 10px;
     height:35px;
-    width: 230px;
+    width: 280px;
     border-radius: 8px;
     border-style: solid;
     border-color: #a8acbc #babdcc #c0c3d2;
 }
-
+/*
 .searchbtn{
     position: absolute;
     height:33px;
@@ -139,7 +139,7 @@ span.tag {
     margin-top: 6px;
     border-radius: 8px;
 }
-
+*/
 .search input {
     height: 26px;
     width: 100%;
