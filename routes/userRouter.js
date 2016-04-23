@@ -78,8 +78,7 @@ router.route('/auth/login/params')
 */
 router.route('/auth/signup/params')
     .post(function(req, res) {
-
-        userFuncs.signup(req.query.userName, res);
+        userFuncs.signup(req.body.userName, res);
     });
 
 module.exports = router;

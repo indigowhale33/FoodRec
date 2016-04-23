@@ -70,7 +70,6 @@ router.route('/ingredients/getAllName')
 */
 router.route('/ingredients/getIngredient/params')
     .get(function(req, res) {
-
         var ingred = new Ingredient(req.query.name, req.query.id);
         ingredientFuncs.getIngredientByParams(ingred, res);
     });

@@ -17,6 +17,7 @@
     <!-- Custom CSS -->
     <link href="css/simple-sidebar.css" rel="stylesheet">
     <link href="css/searchbar.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -36,6 +37,7 @@
         <div class="navbar-header">
             
           <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle</a>
+
           <p id="maintitle">Group 6 Food Recommendation App</p>
           <a href="/logout" id="username"><%= user_name%></a>
         </div>
@@ -52,26 +54,25 @@
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                    <div id="the-basics">
-  <div id="basics">
-  <input id="ingredient-input" class="typeahead" type="text" placeholder="Add Ingredients">
+            <div id="the-basics">
+
+                    <input id="ingredient-input" class="typeahead" type="text" placeholder="Add Ingredients">
 
   <!-- <button type="submit" class="searchbtn"><i class="icon-search"></i></button> -->
-    </div>
+                    </div>
+                    <button id="submitUpdate" type="button" class="btn btn-default">Update Pantry</button>
+            <ul class="sidebar-nav">
+
+
+        <!-- <button id="submitUpdate" type="button" class="btn btn-default">Submit</button> -->
                 
-                <li>
-                    <a href="#">Dashboard</a>
-                </li>
-                
-                <li>
-                    <a href="#">Overview</a>
-                </li>
 
                 <div id="label-container"></div>
-                
             </ul>
         </div>
+                
+            
+            
         <!-- /#sidebar-wrapper -->
 
         <!-- Page Content -->
@@ -162,6 +163,23 @@
           limit: 50
         });
 
+        var makePantrylist = function(){
+            $.get('/api/pantry/getPantry/params?owner_name='+document.getElementById("username").innerHTML, function(res) {
+                var ingred_name='';
+                var NWingredName='';   //no whitespaces ingredient name
+                for(var i=0; i < res.data.length; i++){
+                    ingred_name = getIngredName(res.data[i].ingredient_id);
+                    
+                    NWingredName = ingred_name.replace(/\s+/g,'');
+                    $(".sidebar-nav").append(" <li id="+ NWingredName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ ingred_name +"</a><div class=\"input-group spinner\"><input id="+ NWingredName +" type=\"text\" class=\"form-control\" value=\"0\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+NWingredName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+NWingredName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
+
+                    console.log(ingred_name);
+                    console.log(res.data[i].amount);
+                }
+            });
+        }
+        makePantrylist();
+
         var getUserPantry = function(){
             $.get('/api/recipes/generatePossibleRecipesFromPantry/params?user_name='+document.getElementById("username").innerHTML, function(res) {
                 //$('#val').text(res);
@@ -173,9 +191,8 @@
             var eachrecipe;
             for(var i=0; i < arrdata.length; i++){
                 eachrecipe = arrdata[i];
-                console.log(eachrecipe.image);
                 
-                $("#row2.row").append('<div class="col-sm-3" id=\"box\"><div id=\"picture\"><img src=\"' + eachrecipe.image +'\" height="180px" width="180px"/></div><div id=\"text\" style=>hi</div></div>');
+                $("#row2.row").append('<div class="col-sm-2" id=\"box\"><div id=\"picture\"><img src=\"' + eachrecipe.image +'\" height="180px" width="180px"/></div><div id=\"imgtext\">'+ eachrecipe.recipe_name +'</div></div>');
 
             }
 
@@ -189,10 +206,21 @@
     <script>
 
     $('#the-basics').on('keydown', function(e) {
+
         if(e.which == 13) {
             if(searchingred.indexOf(document.getElementById("ingredient-input").value) != -1 && basket.indexOf(document.getElementById("ingredient-input").value) == -1){
-                $("#label-container").append(" <span id=\"ingred\" class=\"tag label label-info data-role=\"tagsinput\">"+ document.getElementById("ingredient-input").value +"<a><i class=\"remove glyphicon glyphicon-remove-sign glyphicon-white\"></i></a></span>");    
+    
+    //$(".sidebar-nav").append(" <li id="+ document.getElementById("ingredient-input").value +" class=\"list-group\"><a href=\"#\">"+ document.getElementById("ingredient-input").value +"</a><div class=\"input-group\"><span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default btn-number\" disabled=\"disabled\" data-type=\"minus\" data-field=\"quant[1]\"><span class=\"glyphicon glyphicon-minus\"></span></button></span><input type=\"text\" name=\"quant[1]\" class=\"form-control input-number\" value=\"1\" min=\"1\" max=\"10\"><span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default btn-number\" data-type=\"plus\" data-field=\"quant[1]\"><span class=\"glyphicon glyphicon-plus\"></span></button></span></div></li>");
+    var recipeName = (document.getElementById("ingredient-input").value);
+    recipeName = recipeName.replace(/\s+/g,'');
+    $(".sidebar-nav").append(" <li id="+ recipeName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ document.getElementById("ingredient-input").value +"</a><div class=\"input-group spinner\"><input id="+ (document.getElementById("ingredient-input").value).replace(/\s+/g,'') +" type=\"text\" class=\"form-control\" value=\"0\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+recipeName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+recipeName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
+                
+                //$(".sidebar-nav").append(" <li id="+ document.getElementById("ingredient-input").value +" class=\"list-group\"><a href=\"#\">"+ document.getElementById("ingredient-input").value +"</a></li>");
+                //$("#label-container").append(" <span id=\"ingred\" class=\"tag label label-info data-role=\"tagsinput\">"+ document.getElementById("ingredient-input").value +"<a><i class=\"remove glyphicon glyphicon-remove-sign glyphicon-white\"></i></a></span>");    
                 basket.push(document.getElementById("ingredient-input").value);
+                if ($('.sidebar-nav li').length == 1){
+                    document.getElementById("submitUpdate").innerHTML = "Submit Updated Pantry";
+                }
                 
             }
             
@@ -226,6 +254,19 @@
     function addRecipe2(){
         $( "#row2.row" ).append( "<p>Test2</p>" );
     }
+
+    function incre(indicate){
+        $("input[id="+indicate.id+"]").val( parseInt($("input[id="+indicate.id+"]").val(), 10) + 1);
+    }
+
+    function decre(indicate){
+        if(parseInt($("input[id="+ indicate.id + "]").val()) > 0){
+        $("input[id="+indicate.id+"]").val( parseInt($("input[id="+indicate.id+"]").val(), 10) - 1);
+        }
+    }
+
+
+
 </script>
     
 
@@ -234,6 +275,52 @@
     $("#menu-toggle").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+    <script>
+
+    var getIngredName = function(ingred_id){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://localhost:8080/api/ingredients/getIngredient/params?id="+ingred_id,false);
+        xhttp.send();
+        var ingred_name = (JSON.parse(xhttp.responseText).data[0].name);
+        return ingred_name;
+    }
+
+    var getIngredId = function(ingred_name){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://localhost:8080/api/ingredients/getIngredient/params?name="+ingred_name,false);
+        xhttp.send();
+        var ingred_id = (JSON.parse(xhttp.responseText).data[0].id);
+        return ingred_id;
+    }
+
+
+    $("#submitUpdate").click(function(e) {
+        e.preventDefault();
+        var alllist = document.getElementsByClassName("list-group");
+        if(alllist.length >0){
+            for(var i=0; i<alllist.length; i++ ){
+                var xhttp = new XMLHttpRequest();
+                var ingred_id = getIngredId(alllist[i].getElementsByTagName("a")[0].innerHTML);
+                console.log(alllist[i].getElementsByTagName("input")[0].value);
+                console.log(ingred_id);
+
+                xhttp.open("POST", "http://localhost:8080/api/pantry/addIngredientToPantry/params?owner_name="+ document.getElementById("username").innerHTML +"&ingredient_id="+ingred_id+"&amount="+alllist[i].getElementsByTagName("input")[0].value,false);
+                xhttp.send();
+                if(JSON.parse(xhttp.responseText).status != 200){
+                    alert("Submission Failed");
+                }else{
+                    alert("Submission Successful");
+                    window.location.reload(false);
+                }
+
+            }
+        
+        }
+        
+        //$("#wrapper").toggleClass("toggled");
     });
     </script>
 
