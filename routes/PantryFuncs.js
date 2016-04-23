@@ -85,11 +85,11 @@ var PantryFuncs = function() {
                                             .where("ingredient_id = ?", ingredientToAdd)
                                             .toString();
 
-                queryIngredientExists(hasIngredientText, res);
+                queryIngredientExists(hasIngredientText, ingredientToAdd, res);
             }
         });
 
-        function queryIngredientExists(hasIngredientText, res) {
+        function queryIngredientExists(hasIngredientText, ingredientToAdd, res) {
 
             var queryDB = require('../database')(hasIngredientText, function(mssg, data) {
 
@@ -127,6 +127,7 @@ var PantryFuncs = function() {
                                                     .table("pantries")
                                                     .set("amount = " + amount)
                                                     .where("owner_name = ?", userName)
+                                                    .where("ingredient_id = " + ingredientToAdd)
                                                     .toString();
                         updateAmount(updateAmountText, res);
                     }
