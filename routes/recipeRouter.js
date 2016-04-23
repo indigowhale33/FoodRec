@@ -4,6 +4,7 @@ var router  = express.Router();
 var squel   = require("squel");
 var Recipe  = require('../models/recipe');
 var recipeFuncs = require('./RecipeFuncs');
+var recGraph = require('./RecGraph');
 
 // ROUTES
 // =============================================================================
@@ -135,10 +136,35 @@ router.route('/recipes/getPossibleRecipes/params')
         recipeFuncs.getPossibleRecipes(req.query.user_name, res);
     });
 
+/**
+    Combine pantries with a friend's pantry to see what additional recipes they can make
+
+    Params: user_name, friend_name
+
+    Ex:
+    (1) http://localhost:8080/api/recipes/getPossibleRecipesCombinedWithFriendsPantry/params?user_name=Tho&friend_name=Martha
+*/
 router.route('/recipes/getPossibleRecipesCombinedWithFriendsPantry/params')
     .get(function(req, res) {
 
         recipeFuncs.getPossibleRecipesCombinedWithFriendsPantry(req.query.user_name, req.query.friend_name, res);
     });
+
+/**
+    WORKS -- I TESTED W/ REMOTE DB
+
+    Recommends a recipe from another input recipe.
+
+    Params: user_name, recipe_id
+
+    Ex:
+    (1) http://localhost:8080/api/recipes/recommendRecipeCosineSimilarity/params?user_name=Tho&recipe_id=12340
+*/
+router.route('/recipes/recommendRecipeCosineSimilarity/params')
+    .get(function(req, res) {
+
+        recGraph.recommendRecipesCosineSimilarity(res, req.query.user_name, req.query.recipe_id);
+    });
+
 
 module.exports = router;

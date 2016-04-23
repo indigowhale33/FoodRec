@@ -9,18 +9,47 @@ var RecipeFuncs = function() {
     var getRecipeByID = function(id, res) {
 
         var queryText = squel.select()
-                            .from("recipes")
-                            .where("id = ?", id)
+                            .from("recipes, recipe_ingredients, ingredients")
+                            .where("recipes.id = ?", id)
+                            .where("recipe_ingredients.recipe_id = recipes.id")
+                            .where("recipe_ingredients.ingredient_id = ingredients.id")
                             .toString();
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
             
+            console.log(JSON.stringify(data));
+
             if(data == null || data.length < 1) {
                 sendMessage(res, 400, "Could not find any recipe matching that ID", data, "Get recipe by ID");
+                return;
             }
-            else {
-                sendMessage(res, 200, mssg, data, "Get recipe by ID");
+            
+            var formatted = [];
+            formatted.push({
+                "recipe_name": data[0]['recipe_name'],
+                "url": data[0]["url"],
+                "image": data[0]['image'],
+                "date_published": data[0]['date_published'],
+                "cook_time": data[0]["cook_time"],
+                "source": data[0]["source"],
+                "recipe_yield": data[0]['recipe_yield'],
+                "id": data[0]['id'],
+                "prep_time": data[0]['prep_time'],
+                "description": data[0]['description'],
+                "ingredients": [] 
+            });
+
+            for(var i = 0; i < data.length; i++) {
+                formatted[0]['ingredients'].push({
+                    "ingredient_id": data[i]["ingredient_id"],
+                    "amount": data[i]["amount"],
+                    "name": data[i]["name"]
+                });
             }
+
+
+            sendMessage(res, 200, mssg, formatted, "Get recipe by ID");
+            
         });
     };
 
@@ -49,7 +78,7 @@ var RecipeFuncs = function() {
            }
            else {
                 console.log("data: " + JSON.stringify(data, null, 2));
-                sendMessage(res, 200, "Success!", data, "Get recipe based on ingredients in pantry");
+                sendMessage(res, 200, "Success!", data.splice(0,100), "Get recipe based on ingredients in pantry");
            }          
         }); 
     };
@@ -224,7 +253,7 @@ var RecipeFuncs = function() {
         var queryText_check = "SELECT ri_inner.ingredient_id " +
                             "FROM recipe_ingredients ri_inner JOIN pantries p " +
                             "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
-                            "LIMIT 100;";
+                            ";";
 
         var queryDB_check = require('../database')(queryText_check, function(mssg, data) { 
 
@@ -247,7 +276,7 @@ var RecipeFuncs = function() {
                             "SELECT ri_inner.ingredient_id " +
                             "FROM recipe_ingredients ri_inner JOIN pantries p " +
                             "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
-                        ") LIMIT 100;";
+                        ");";
 
             var queryDB = require('../database')(queryText, function(mssg, data) {                 
 
@@ -265,6 +294,7 @@ var RecipeFuncs = function() {
 
                         if(formatted[j] == null)
                             continue;
+                        
                         if(formatted[j]['recipe_id'] == data[i]['recipe_id']) {
                             keyExistsInArr = true;
                             formatted[j]['ingredients_needed'].push({"ingredient_id":data[i]['ingredient_id'], "amount":data[i]['amount']});
@@ -318,7 +348,7 @@ var RecipeFuncs = function() {
                 sendMessage(res, 400, "Failed", data, "get possible recipes combining two pantries");
             }
             else{
-                sendMessage(res, 200, mssg, data, "get possible recipes combining two pantries");
+                sendMessage(res, 200, mssg, data.splice(0,100), "get possible recipes combining two pantries");
             }
         });
     };
