@@ -89,6 +89,7 @@ Here are the routes that I finished and I have tested with the remote database. 
 
 `/ingredients/suggestIngredients/params` -- suggests an ingredient that will generate the most recipes if it were added. Works!
 
+`/recipes/recommendRecipeCosineSimilarity/params` -- suggests a recipe from another recipe. Uses the cosine similarity method. Tested.
 
 More info on these calls in the appropriate `%router.js` file in the \router folder.
 
