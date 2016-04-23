@@ -87,6 +87,8 @@ Here are the routes that I finished and I have tested with the remote database. 
 
 `/recipes/getPossibleRecipesCombinedWithFriendsPantry/params`-- merge 2 pantries together to get even more possible recipes. Useful if you want 2 users to put their ingredients together to see what they can make together.
 
+`/ingredients/suggestIngredients/params` -- suggests an ingredient that will generate the most recipes if it were added. Works!
 
 
 More info on these calls in the appropriate `%router.js` file in the \router folder.
+

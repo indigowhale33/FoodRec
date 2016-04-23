@@ -223,7 +223,8 @@ var RecipeFuncs = function() {
 
         var queryText_check = "SELECT ri_inner.ingredient_id " +
                             "FROM recipe_ingredients ri_inner JOIN pantries p " +
-                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id";
+                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
+                            "LIMIT 100;";
 
         var queryDB_check = require('../database')(queryText_check, function(mssg, data) { 
 
@@ -246,7 +247,7 @@ var RecipeFuncs = function() {
                             "SELECT ri_inner.ingredient_id " +
                             "FROM recipe_ingredients ri_inner JOIN pantries p " +
                             "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
-                        ")";
+                        ") LIMIT 100;";
 
             var queryDB = require('../database')(queryText, function(mssg, data) {                 
 

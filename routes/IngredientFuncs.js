@@ -2,6 +2,42 @@ var squel = require("squel");
 
 var PantryFuncs = function() {
 
+    var suggestIngredients = function(user_name, res) {
+
+        var queryText = 
+            "SELECT ingredients.id, " + 
+                "ingredients.name, " +
+                "count(*) num_recipes " +
+            "FROM ingredients " +
+                "INNER JOIN recipe_ingredients on ingredients.id = recipe_ingredients.ingredient_id " +
+                "INNER JOIN ( " +
+                    "SELECT id, count(*) " +
+                    "FROM recipes " +
+                        "INNER JOIN recipe_ingredients on recipes.id = recipe_ingredients.recipe_id " +
+                        "LEFT JOIN pantries on recipe_ingredients.ingredient_id = pantries.ingredient_id " +
+                                            "AND pantries.owner_name = \'" + user_name + "\' " +
+                    "WHERE pantries.ingredient_id is null " +
+                    "GROUP BY id " +
+                    "HAVING count(*) = 1) q " +
+                        "ON recipe_ingredients.recipe_id = q.id " +
+                "LEFT JOIN pantries ON recipe_ingredients.ingredient_id = pantries.ingredient_id " +
+            "WHERE pantries.ingredient_id is null " +
+            "GROUP BY ingredients.id, ingredients.name " +
+            "ORDER BY num_recipes DESC " +
+            "LIMIT 50;";
+
+        var queryDB = require('../database')(queryText, function(mssg, data) {
+
+            if(data == null || data.length < 1 || mssg == "Problem querying database...") {
+                sendMessage(res, 400, "Cannot suggest an ingredient: " + mssg, data, "Suggest ingredient");
+            }
+            else {
+                sendMessage(res, 200, mssg, data, "Suggest an ingredient");
+            }
+        });
+
+    };
+
     var getAllName = function(res) {
 
         var queryText = squel.select()
@@ -111,7 +147,8 @@ var PantryFuncs = function() {
         getAllIngredients: getAllIngredients,
         getAllName: getAllName,
         getIngredientByParams: getIngredientByParams,
-        getIngredientBySubstring: getIngredientBySubstring
+        getIngredientBySubstring: getIngredientBySubstring,
+        suggestIngredients: suggestIngredients
     };
 
 }();

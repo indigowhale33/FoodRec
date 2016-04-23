@@ -29,7 +29,23 @@ router.route('/ingredients/getAll')
     });
 
 
+/**
+    WORKS -- I TESTED W/ REMOTE DB
 
+    Suggests an ingredient that, when added, will generate
+    the most recipes.
+
+    Params: user_name
+
+    ex:
+    (1) http://localhost:8080/api/ingredients/suggestIngredients/params?user_name=Martha
+    (2) http://localhost:8080/api/ingredients/suggestIngredients/params?user_name=Tho
+
+*/
+router.route('/ingredients/suggestIngredients/params')
+    .get(function(req, res) {
+        ingredientFuncs.suggestIngredients(req.query.user_name, res);
+    });
 
 
 
@@ -65,11 +81,12 @@ router.route('/ingredients/getAllName')
     Params: name OR id
 
     ex: 
-    (1) http://localhost:8080/api/ingredients/params?ingredName=Butter
+    (1) http://localhost:8080/api/ingredients/params?name=Butter
     (2) http://localhost:8080/api/ingredients/params?id=2222
 */
 router.route('/ingredients/getIngredient/params')
     .get(function(req, res) {
+
         var ingred = new Ingredient(req.query.name, req.query.id);
         ingredientFuncs.getIngredientByParams(ingred, res);
     });
