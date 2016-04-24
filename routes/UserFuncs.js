@@ -46,6 +46,21 @@ var UserFuncs = function() {
         });
     };
 
+    var getAllFriends = function(userName, res){
+        var queryText = squel.select("username_2")
+                            .from("friends")
+                            .where("username_1 = ?", userName)
+                            .toString();
+
+        var dbQuery = require('../database')(queryText, function(mssg, data) {
+
+            if(data == null || data.length < 1)
+                sendMessage(res, 400, "No friends in friends table", data, "Get all friends name");
+            else
+                sendMessage(res, 200, mssg, data, "Get all friends name");
+        });
+    }
+
     /**
         Insert new friend. Does not insert mutually for both people, only for
         one person.
@@ -103,6 +118,17 @@ var UserFuncs = function() {
         }
     }
 
+    function allUsers(req, res){
+        var queryText = squel.select()
+                            .from("users")
+                            .toString();
+
+        return require('../database')(queryText,function(mssg, data) {
+            res.send(data);
+        });
+
+    }
+
     function checkUserExists(userName, callback) {
 
         var queryText = squel.select()
@@ -149,7 +175,9 @@ var UserFuncs = function() {
         login: login,
         signup: signup,
         insertNewFriend: insertNewFriend,
-        deleteFriend: deleteFriend
+        deleteFriend: deleteFriend,
+        allUsers: allUsers,
+        getAllFriends: getAllFriends
     }
 
 }();

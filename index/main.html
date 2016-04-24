@@ -9,15 +9,18 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Simple Sidebar - Start Bootstrap Template</title>
+    <title>CooQ - Main page</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css">
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <script type="text/JavaScript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
     <!-- Custom CSS -->
     <link href="css/simple-sidebar.css" rel="stylesheet">
     <link href="css/searchbar.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -38,8 +41,31 @@
             
           <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle</a>
 
-          <p id="maintitle">Group 6 Food Recommendation App</p>
-          <a href="/logout" id="username"><%= user_name%></a>
+          <p id="maintitle">CooQ</p>
+
+           <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" id="username" class="dropdown-toggle" data-toggle="dropdown"><%= user_name%><b class="caret"></b></a>
+              <ul class="dropdown-menu pull-right" role="menu">
+                                    <!-- Account -->
+                                    <li class="dropdown-submenu">
+                                        <a href="#" >Friends</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a data-toggle="modal" data-target="#myModal">Add Friends</a>
+                                                
+                                            
+                                            <li><a data-toggle="modal" data-target="#CombineModal">Edit Account</a></li>
+                                            <li><a href="#">Set Account Status</a></li>
+                                        </ul>
+                                    </li>
+
+                <li class="divider"></li>
+                <li><a href="/logout">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <!-- <a href="/logout" id="username"><%= user_name%></a> -->
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           
@@ -91,22 +117,19 @@
     <!-- /#wrapper -->
     
     <!-- Bootstrap Core JavaScript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-tagsinput/1.3.6/jquery.tagsinput.min.js"></script>
+
     
 
     <script type="text/javascript">
-        var importrecipes = function(userid){
 
-            //$( "#row1.row" ).append( "<p>"+userid+"</p>" );
-            //console.log(userid);
-        }
        
         $( document ).ready(function() {
             user_name = document.getElementById("username").innerHTML;
-            importrecipes(user_name);
+            
+            user_name = user_name.replace("<b class=\"caret\"></b>","");
         });
     </script>
     
@@ -164,24 +187,22 @@
         });
 
         var makePantrylist = function(){
-            $.get('/api/pantry/getPantry/params?owner_name='+document.getElementById("username").innerHTML, function(res) {
+            $.get('/api/pantry/getPantry/params?owner_name='+(document.getElementById("username").innerHTML).replace("<b class=\"caret\"></b>",""), function(res) {
                 var ingred_name='';
                 var NWingredName='';   //no whitespaces ingredient name
                 for(var i=0; i < res.data.length; i++){
                     ingred_name = getIngredName(res.data[i].ingredient_id);
-                    
-                    NWingredName = ingred_name.replace(/\s+/g,'');
-                    $(".sidebar-nav").append(" <li id="+ NWingredName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ ingred_name +"</a><div class=\"input-group spinner\"><input id="+ NWingredName +" type=\"text\" class=\"form-control\" value=\"0\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+NWingredName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+NWingredName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
 
-                    console.log(ingred_name);
-                    console.log(res.data[i].amount);
+                    NWingredName = ingred_name.replace(/\s+/g,'');
+                    $(".sidebar-nav").append(" <li id="+ NWingredName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ ingred_name +"</a><div class=\"input-group spinner\"><input id="+ NWingredName +" type=\"text\" class=\"form-control\" value=\""+res.data[i].amount+"\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+NWingredName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+NWingredName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
+
                 }
             });
         }
         makePantrylist();
 
         var getUserPantry = function(){
-            $.get('/api/recipes/generatePossibleRecipesFromPantry/params?user_name='+document.getElementById("username").innerHTML, function(res) {
+            $.get('/api/recipes/generatePossibleRecipesFromPantry/params?user_name='+(document.getElementById("username").innerHTML).replace("<b class=\"caret\"></b>",""), function(res) {
                 //$('#val').text(res);
                 buildContent(res.data);
             });
@@ -247,14 +268,6 @@
     });
 
 
-    function addRecipe(){
-        $( "#row1.row" ).append( "<p>Test</p>" );
-    }
-
-    function addRecipe2(){
-        $( "#row2.row" ).append( "<p>Test2</p>" );
-    }
-
     function incre(indicate){
         $("input[id="+indicate.id+"]").val( parseInt($("input[id="+indicate.id+"]").val(), 10) + 1);
     }
@@ -300,29 +313,202 @@
     $("#submitUpdate").click(function(e) {
         e.preventDefault();
         var alllist = document.getElementsByClassName("list-group");
+        var flag = 0;
         if(alllist.length >0){
             for(var i=0; i<alllist.length; i++ ){
                 var xhttp = new XMLHttpRequest();
                 var ingred_id = getIngredId(alllist[i].getElementsByTagName("a")[0].innerHTML);
-                console.log(alllist[i].getElementsByTagName("input")[0].value);
-                console.log(ingred_id);
 
-                xhttp.open("POST", "http://localhost:8080/api/pantry/addIngredientToPantry/params?owner_name="+ document.getElementById("username").innerHTML +"&ingredient_id="+ingred_id+"&amount="+alllist[i].getElementsByTagName("input")[0].value,false);
-                xhttp.send();
-                if(JSON.parse(xhttp.responseText).status != 200){
-                    alert("Submission Failed");
-                }else{
-                    alert("Submission Successful");
-                    window.location.reload(false);
+                if(alllist[i].getElementsByTagName("input")[0].value == 0){  //when amount set 0, delete ingredient from pantry
+                    xhttp.open("POST", "http://localhost:8080/api/pantry/deleteIngredient/params?owner_name="+ (document.getElementById("username").innerHTML).replace("<b class=\"caret\"></b>","") +"&ingredient_id="+ingred_id,false);
+
+                    xhttp.send();
+                    if(JSON.parse(xhttp.responseText).status == 200){
+                        flag = 1;
+                    }
+                }else{  //when amount > 0, just update
+ 
+                    xhttp.open("POST", "http://localhost:8080/api/pantry/addIngredientToPantry/params?owner_name="+ (document.getElementById("username").innerHTML).replace("<b class=\"caret\"></b>","") +"&ingredient_id="+ingred_id+"&amount="+alllist[i].getElementsByTagName("input")[0].value,false);
+
+                    xhttp.send();
+                    if(JSON.parse(xhttp.responseText).status == 200){
+                        flag = 1;
+                    }
                 }
 
             }
+            if(flag === 1 ){
+                alert("Update Succeeded");
+            }else{
+                alert("Update Failed");
+            }
+            
+            window.location.reload(false);
         
         }
         
         //$("#wrapper").toggleClass("toggled");
     });
+
+    //dropdown for navbar user
+    $(function(){
+    $(".dropdown").hover(            
+            function() {
+                $('#top-menu.dropdown-menu', this).stop( true, true ).fadeIn("fast");
+                $(this).toggleClass('open');
+                $('b', this).toggleClass("caret caret-up");                
+            },
+            function() {
+                $('#top-menu.dropdown-menu', this).stop( true, true ).fadeOut("fast");
+                $(this).toggleClass('open');
+                $('b', this).toggleClass("caret caret-up");                
+            },
+            function() {
+                $('.dropdown-submenu', this).stop( true, true ).fadeIn("fast");
+                $(this).toggleClass('open');
+                $('b', this).toggleClass("caret caret-up");                
+            },
+            function() {
+                $('.dropdown-submenu', this).stop( true, true ).fadeOut("fast");
+                $(this).toggleClass('open');
+                $('b', this).toggleClass("caret caret-up");                
+            });
+    });
+
+
+/////Modal Add/Delete Friends/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    $(function(){
+    $(document).on("click", "#modal_submit_btn", function(event){
+        //var fbody= ($("#friendmodal").contents().find('body'));
+        var fbody = (document.getElementById('friendmodal').contentWindow.document).getElementsByTagName('span');
+        
+        //alert( ($("#friendmodal").contents().find('div')) );
+        //alert(($("#friendmodal").contents().find('div')).html());
+
+    
+        var xhttp;
+        
+
+        for (var i = 0; i < fbody.length -1; i++) {
+            xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:8080/api/auth/insertNewFriend/params?userName="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&newFriend=" + fbody[i].innerHTML,false);
+            xhttp.send();
+            alert(JSON.parse(xhttp.responseText));
+            alert(fbody[i].innerHTML); //second console output
+        }
+
+        $('#myModal').modal('hide');
+    }); 
+
+    $(function(){
+        document.getElementById('friendmodal').src = "remote.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+        document.getElementById('CombineModalPage').src = "combineModal.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+
+    }); 
+});
+
+/////////////////////Collaborate with Friends Modal////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+$(function(){
+    $(document).on("click", "#comb_modal_submit", function(event){
+
+        var fbody = (document.getElementById('CombineModalPage').contentWindow.document).getElementsByTagName('input');
+        
+        var xhttp;
+        
+        // for (var i = 0; i < fbody.length; i++) {
+        //     xhttp = new XMLHttpRequest();
+        //     xhttp.open("POST", "http://localhost:8080/api/recipes/getPossibleRecipesCombinedWithFriendsPantry/params?user_name="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&friend_name=" + fbody[i].value,false);
+        //     xhttp.send();
+
+        // }
+        var parentNode = document.getElementById("row2");
+        parentNode.innerHTML = '';
+        // for(var i =0; i < 2; i++){
+        //     alert(String(parentNode.firstChild));
+        //     parentNode.remove(parentNode.firstChild);
+        // }
+        
+        // while(parentNode.hasChildNodes()){
+        //     alert(parentNode.hasChildNodes());
+        //     parentNode.remove(parentNode.firstChild);
+        // }
+
+        var getCombinedPantry = function(){
+            $.get("http://localhost:8080/api/recipes/getPossibleRecipesCombinedWithFriendsPantry/params?user_name="+ (document.getElementById("username").innerHTML).replace("<b class=\"caret\"></b>","") + "&friend_name=" + fbody[0].value, function(res) {
+                //$('#val').text(res);
+                buildContent(res.data);
+            });
+        }
+        getCombinedPantry();
+            // xhttp = new XMLHttpRequest();
+            // xhttp.open("POST", "http://localhost:8080/api/auth/insertNewFriend/params?userName="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&newFriend=" + fbody[i].innerHTML,false);
+            // xhttp.send();
+            // alert(JSON.parse(xhttp.responseText));
+            //alert(fbody[0]); //second console output
+
+         $('#CombineModal').modal('hide');
+    }); 
+
+    $(function(){
+        document.getElementById('friendmodal').src = "remote.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+        document.getElementById('CombineModalPage').src = "combineModal.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+
+    }); 
+});
+
+
+
+
+    
+
     </script>
+
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h4 class="modal-title">Add/Delete Friends</h4>
+
+            </div>
+            <div class="modal-body"><iframe id="friendmodal" src="remote.html" name="targetframe" allowTransparency="true" scrolling="yes" frameborder="0" style="width:100%" >
+    </iframe></div>
+            <div class="modal-footer">
+                <button id="modal_cancel_btn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="modal_submit_btn" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+
+<div class="modal" id="CombineModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h4 class="modal-title">Combine with Your Friend's pantry</h4>
+
+            </div>
+            <div class="modal-body"><iframe id="CombineModalPage" src="combineModal.html" name="targetframe" allowTransparency="true" scrolling="yes" frameborder="0" style="width:100%" >
+    </iframe></div>
+            <div class="modal-footer">
+                <button id="comb_modal_cancel" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="comb_modal_submit" type="button" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
 
 </body>
 

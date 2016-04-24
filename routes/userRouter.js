@@ -24,13 +24,28 @@ router.route('/auth')
         );
     });
 
+    router.route('/auth/allUsers')
+    .get(function(req, res) {
+        userFuncs.allUsers(req, res);
+        //res.send(userFuncs.allUsers());
+    });
+
+
+
+    router.route('/auth/getAllFriends/params')
+    .get(function(req, res) {
+
+        userFuncs.getAllFriends(req.query.userName, res);
+    });
+
+
 /**
     Update friends.
 
     Params: userName, newFriend
 
     ex:
-    (1) http://localhost:8080/api/auth/updateFriends/params?userName=Albert&newFriend=Cindy
+    (1) http://localhost:8080/api/auth/insertNewFriend/params?userName=Albert&newFriend=Cindy
 */
 router.route('/auth/insertNewFriend/params')
     .post(function(req, res) {
