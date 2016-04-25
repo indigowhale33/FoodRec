@@ -32,7 +32,7 @@ router.route('/pantry')
     Params: owner_name
 
     ex:
-    (1) http://localhost:8080/api/pantry/params?owner_name=alien1
+    (1) http://localhost:8080/api/getPantry/params?owner_name=alien1
 */
 router.route('/pantry/getPantry/params')
     .get(function(req, res) {

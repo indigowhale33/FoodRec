@@ -212,14 +212,44 @@
             var eachrecipe;
             for(var i=0; i < arrdata.length; i++){
                 eachrecipe = arrdata[i];
-                
-                $("#row2.row").append('<div class="col-sm-2" id=\"box\"><div id=\"picture\"><img src=\"' + eachrecipe.image +'\" height="180px" width="180px"/></div><div id=\"imgtext\">'+ eachrecipe.recipe_name +'</div></div>');
+                $("#row2.row").append('<a href=\"recipes/recipe/params?recipeName='+eachrecipe.recipe_name+'\"><div class="col-sm-2" id=\"box\"><div id=\"picture\"><img src=\"' + eachrecipe.image +'\" class=\"img-thumbnail size padding\" height="240px" width="240px"/></div><div id=\"imgtext\" style=\"color: rgb(0,0,0)\">'+ eachrecipe.recipe_name +'</div></div></a>');
 
             }
 
         }
 
         getUserPantry();
+
+
+        $(function(){
+            $(document).on("click", "#modal_submit_btn", function(event){
+                //var fbody= ($("#friendmodal").contents().find('body'));
+                var fbody = (document.getElementById('friendmodal').contentWindow.document).getElementsByTagName('span');
+                
+                //alert( ($("#friendmodal").contents().find('div')) );
+                //alert(($("#friendmodal").contents().find('div')).html());
+
+            
+                var xhttp;
+                
+
+                for (var i = 0; i < fbody.length -1; i++) {
+                    xhttp = new XMLHttpRequest();
+                    xhttp.open("POST", "http://localhost:8080/api/auth/insertNewFriend/params?userName="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&newFriend=" + fbody[i].innerHTML,false);
+                    xhttp.send();
+                    alert(JSON.parse(xhttp.responseText));
+                    alert(fbody[i].innerHTML); //second console output
+                }
+
+                $('#myModal').modal('hide');
+            }); 
+
+            $(function(){
+                document.getElementById('friendmodal').src = "remote.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+                document.getElementById('CombineModalPage').src = "combineModal.html?userName=" + document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","");
+
+            }); 
+        });
 
 
     </script>

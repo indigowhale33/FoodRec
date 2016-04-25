@@ -59,7 +59,7 @@ router.route('/ingredients/suggestIngredients/params')
     Params: substring
 
     ex: 
-    (1) http://localhost:8080/api/ingredients/params?substring=chicken
+    (1) http://localhost:8080/api/ingredients/getIngredientBySubstring/params?substring=chicken
 */
 router.route('/ingredients/getIngredientBySubstring/params')
     .get(function(req, res) {

@@ -3,6 +3,22 @@ var async   = require('async');
 
 var RecipeFuncs = function() {
 
+
+    var getRecipeIdByName = function(recipeName, res){
+        var queryText = squel.select()
+                            .from("recipes")
+                            .where("recipes.recipe_name = ?", recipeName)
+                            .toString();
+
+         var queryDB = require('../database')(queryText, function(mssg, data) {
+            if(data == null || data.length < 1)
+                sendMessage(res, 400, "No Recipe Id in Recipes table", data, "Get Recipe Id");
+            else
+                sendMessage(res, 200, mssg, data[0].id, "Get Recipe Id");
+        });
+
+    }
+
     /**
     *   Get recipe by ID
     */
@@ -372,7 +388,8 @@ var RecipeFuncs = function() {
         getRecipeByID: getRecipeByID,
         generateNutritionFacts: generateNutritionFacts,
         getPossibleRecipes: getPossibleRecipes,
-        getPossibleRecipesCombinedWithFriendsPantry: getPossibleRecipesCombinedWithFriendsPantry
+        getPossibleRecipesCombinedWithFriendsPantry: getPossibleRecipesCombinedWithFriendsPantry,
+        getRecipeIdByName: getRecipeIdByName
     };
 
 }();

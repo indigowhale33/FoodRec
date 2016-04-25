@@ -45,6 +45,8 @@ router.route('/recipes/generatePossibleRecipesFromPantry/params')
         recipeFuncs.generatePossibleRecipesFromPantry(req.query.user_name, res);
     });
 
+
+
 /**
     WORKS -- I TESTED W/ REMOTE DB
         NOTE: the basic JSON return structure is ready, but I need to revise the underlying logic
@@ -80,6 +82,14 @@ router.route('/recipes/getRecipe/params')
 
         recipeFuncs.getRecipeByID(req.query.id, res);
     });
+
+
+/**
+Get RecipeId by RecipeName
+*/
+router.route('/recipes/getRecipeIdByName/params').get(function(req, res){
+    recipeFuncs.getRecipeIdByName(req.query.recipeName, res);
+});
 
 /**
 
