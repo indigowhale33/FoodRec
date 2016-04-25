@@ -1,16 +1,30 @@
-var squel = require('squel');
+var Helper = require('./RecGraphHelper');
 
 var RecGraph = function() {
 
 	/**
-		Represent each recipe as a vector of all ingredients in the kitchen
-	
-		The value of each ingredient is the mass fraction of what the
+
+        (1) Build a network of recipes that share common ingredients.
+            --> done by building a subset of other recipes the input
+                recipe closely shares with other ingredients. This is
+                done with a query, then ordering recipes in descending
+                order of how many ingredients they share with each other.
+        (2) In this network, recipes that share similar ingredients are
+            linked together, and recipes that share the most ingredients 
+            together are neighbors.
+        (3) However, defining recipe neighborhood by the number of
+            ingredients that they share in common is not helpful for
+            recommendation. For instance, a pecan cake and an apple pie
+            share many ingredients in common, but they are defined by several
+            key ingredients
+        (4) Therefore, it would be more useful to see the mass fraction
+            that each ingredient contributes to the overall recipe.
+        (5) Represent each recipe as a vector of all ingredients needed
+            to cook them
+		(6) The value of each ingredient is the mass fraction of what the
 			corresponding ingredient takes up in the recipe
-
-		To measure the similarity between two recipes, take the cosine
+        (7) To measure the similarity between two recipes, take the cosine
 			similarity between their vectors
-
 
 		Cosine similarity:
 				  x * y
@@ -26,7 +40,7 @@ var RecGraph = function() {
 	var recommendRecipesCosineSimilarity = function(res, user_name, recipe_id) {
 
 		// get list of possible recipes
-		getPossibleRecipes(res, user_name, recipe_id, function(mssg, data) {
+		Helper.getPossibleRecipes(res, user_name, recipe_id, function(mssg, data) {
 
             performCalculations(res, user_name, recipe_id, data);
         });
@@ -41,7 +55,7 @@ var RecGraph = function() {
         for(var i = 0; i < data.length; i++) {
 
             if(data[i]['recipe_id'] == recipe_id) {
-                console.log("fond recipe!");
+                //console.log("fond recipe!");
                 makeVector(x, data[i]);
                 myRecipeName = data[i]['recipe_name'];
                 break;
@@ -89,6 +103,8 @@ var RecGraph = function() {
             var cosSimilarity = cosineSimilarity(x,y);
             //console.log("recipe_name: " + data[i]['recipe_name']);
             //console.log("leventstein: " + levenstein);
+            if(isNaN(cosSimilarity))
+                continue;
 
             //console.log("cos_sim: " + cosSimilarity);
             allCos.push({
@@ -111,7 +127,7 @@ var RecGraph = function() {
         }
         */
         
-        sendMessage(res, 200, "Success", allCos.splice(0,50), "Generate similar recipes by cosine similarity");
+        sendMessage(res, 200, "Success", allCos.splice(0,100), "Generate similar recipes by cosine similarity");
     }
 
     function levenshteinDistance(str1, str2) {
@@ -178,30 +194,20 @@ var RecGraph = function() {
 
     function dotProduct(x, y) {
 
-        //console.log(x);
-        //console.log("y: " + y);
         var n = 0;
         var lim = Math.min(x.length, y.length);
-        //x.sort();
-        //y.sort();
        
         for (var i = 0; i < lim; i++) {
-
-            //if(i == lim -1) {
-            //    n += x[i];
-            //}
             n += x[i] * y[i];
         }
 
-        //console.log("dot product: " + n);
         return n;
     }
 
     function makeVector(arr, recipeData) {
         
-        //console.log("recipedata: " + JSON.stringify(recipeData, null, 2));
-
         var totalMass = 0.0;
+
         // determine total mass of current recipe
         for(var i = 0; i < recipeData['ingredients'].length; i++) {
             
@@ -209,132 +215,37 @@ var RecGraph = function() {
 
             if(isNaN(curNum))
                 continue;
+            if(ingredientIsUnimportant(recipeData['ingredients'][i]['recipe_id']))
+                continue;
 
             totalMass += curNum;
         }
 
-        //console.log("totalMass: " + totalMass);
         // determine mass fraction of ingredients
         for(var i = 0; i < recipeData['ingredients'].length; i++) {
             arr.push(parseFloat(recipeData['ingredients'][i]['amount']) / totalMass);
         }
-
-        //console.log(arr);
     }
 
+    function ingredientIsUnimportant(curRecipe) {
 
-////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-	/**
-        Generates ingredients that, when added to the pantry, 
-        will allow for more recipes
-    */
-    var getPossibleRecipes = function(res, user_name, recipe_id, callback) {
-
-    	// limit 10 because we don't need a lot to verify...
-        var queryText_check = 
-                            "SELECT ri_inner.ingredient_id " +
-                            "FROM recipe_ingredients ri_inner JOIN pantries p " +
-                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
-                            "LIMIT 5;";
-
-        var queryDB_check = require('../database')(queryText_check, function(mssg, data) { 
-
-            if(data == null || data.length < 1) {
-                sendMessage(res, 400, "Either user has an invalid ingredient id or user does not exist: " + user_name, data, "Get possible recipes");
-                return;
-            }
-
-            next_step(res, user_name, recipe_id, callback);
-        });
-
-        function next_step(res, user_name, recipe_id, callback) {
-
-            var queryText = "SELECT recipe_id, recipe_name, ingredient_id, amount " +
-                        "FROM recipes, recipe_ingredients ri_outer " +
-                        "WHERE (recipes.id = ri_outer.recipe_id) AND (ri_outer.recipe_id = " + recipe_id + " OR ri_outer.ingredient_id NOT IN " +
-                        "( " +
-                            "SELECT ri_inner.ingredient_id " +
-                            "FROM recipe_ingredients ri_inner JOIN pantries p " +
-                            "ON p.owner_name=\'" + user_name + "\' AND ri_inner.ingredient_id = p.ingredient_id " +
-                        "));";
-
-            var queryDB = require('../database')(queryText, function(mssg, data) {                 
-
-                //console.log("DATA: " + JSON.stringify(data, null, 2));
-
-                if(data == null || data.length < 1) {
-                    sendMessage(res, 400, "Could not find any ingredients that will help : " + user_name, data, "Get possible recipes");
-                    return;
-                }
-                
-                
-                var formatted = [];
-                for(var i = 0; i < data.length; i++) {
-
-                    var keyExistsInArr = false;
-                    for(var j = 0; j < formatted.length; j++) {
-
-                        if(formatted[j] == null)
-                            continue;
-                        
-                        if(formatted[j]['recipe_id'] == data[i]['recipe_id']) {
-                            keyExistsInArr = true;
-                            formatted[j]['ingredients'].push({"ingredient_id":data[i]['ingredient_id'], "amount":data[i]['amount']});
-                            formatted[j]['ingredients_needed_count'] += 1;
-                        }
-                    }
-
-                    if(!keyExistsInArr) {
-
-                        formatted.push(
-                            {
-                                "recipe_id": data[i]['recipe_id'],
-                                "recipe_name": data[i]['recipe_name'],
-                                "ingredients_needed_count": 1,
-                                "ingredients": [{"ingredient_id": data[i]['ingredient_id'], 
-                                                "amount":data[i]['amount']
-                                }]
-                            }
-                        );
-                    }
-                }
-
-                formatted.sort(function(a, b) {
-                    return parseInt(a['ingredients_needed_count']) - parseInt(b['ingredients_needed_count']);
-                });
-
-                if(formatted.length == 0) {
-                    sendMessage(res, 400, "Could not find any other ingredients for any other recipes", [], "Get ingredients that, when added, will allow for more recipes");
-                }
-
-                //console.log("DATA: " + JSON.stringify(formatted, null, 2));
-                callback(mssg, formatted);
-                
-            });
-        }
-    };
-
-    function getRecipeByID(res, id, callback) {
-
-        var queryText = squel.select()
-                            .from("recipes")
-                            .where("id = ?", id)
-                            .toString();
-
-        var queryDB = require('../database')(queryText, function(mssg, data) {
-            
-            if(data == null || data.length < 1) {
-                sendMessage(res, 400, "Could not find any recipe matching that ID", data, "Get recipe by ID");
-            }
-            else {
-                callback(mssg, data);
-            }
-        });
-    };
+        /* 
+            long boolean chain statement because
+            of time complexity concerns (i didn't want
+            it to search linearly through an array)
+        */
+        return curRecipe == 13643 || curRecipe == 13651 || 
+                curRecipe == 12191 || curRecipe == 10000 || 
+                curRecipe == 10001 || curRecipe == 10002 || 
+                curRecipe == 10078 || curRecipe == 12931 ||
+                curRecipe == 12979 || curRecipe == 12902 ||
+                curRecipe == 10161 || curRecipe == 13034 ||
+                curRecipe == 11445 || curRecipe == 11462 ||
+                curRecipe == 11492 || curRecipe == 13427 ||
+                curRecipe == 11378 || curRecipe == 13023 ||
+                curRecipe == 13063 || curRecipe == 13020
+                ;
+    }
 
     function sendMessage(res, status, mssg, mRows, requestType) {
 
@@ -349,11 +260,9 @@ var RecGraph = function() {
         res.json(response);
     }
 
-	return {
-		recommendRecipesCosineSimilarity: recommendRecipesCosineSimilarity,
-		getPossibleRecipes: getPossibleRecipes
-	}
-
+    return {
+        recommendRecipesCosineSimilarity: recommendRecipesCosineSimilarity
+    }
 }();
 
 module.exports = RecGraph;
