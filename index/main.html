@@ -39,7 +39,7 @@
       <div class="container">
         <div class="navbar-header">
             
-          <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle</a>
+          <a href="#menu-toggle" class="btn btn-default" id="menu-toggle"><span id="menu-toggle-btn" class="glyphicon glyphicon-chevron-right"></span></a>
 
           <p id="maintitle">CooQ</p>
 
@@ -54,8 +54,8 @@
                                             <li><a data-toggle="modal" data-target="#myModal">Add Friends</a>
                                                 
                                             
-                                            <li><a data-toggle="modal" data-target="#CombineModal">Edit Account</a></li>
-                                            <li><a href="#">Set Account Status</a></li>
+                                            <li><a data-toggle="modal" data-target="#CombineModal">Combine with Friend's Pantry</a></li>
+                                            <li><a href="#">Recommended Ingredients</a></li>
                                         </ul>
                                     </li>
 
@@ -166,11 +166,11 @@
         var searchingred = [];
         var basket= [];
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "http://localhost:8080/api/ingredients/getAllName",false);
+        xhttp.open("GET", "http://localhost:8080/api/ingredients/getAll",false);
         xhttp.send();
         var statesdat = (JSON.parse(xhttp.responseText)).data
         for(var i = 0; i < statesdat.length; i++){
-            searchingred.push(statesdat[i].name);
+            searchingred.push(statesdat[i].name+"("+statesdat[i].id+")");
         }
 
 
@@ -193,7 +193,8 @@
                 for(var i=0; i < res.data.length; i++){
                     ingred_name = getIngredName(res.data[i].ingredient_id);
 
-                    NWingredName = ingred_name.replace(/\s+/g,'');
+                    NWingredName = ingred_name+"("+res.data[i].ingredient_id+")";
+                    basket.push(NWingredName);
                     $(".sidebar-nav").append(" <li id="+ NWingredName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ ingred_name +"</a><div class=\"input-group spinner\"><input id="+ NWingredName +" type=\"text\" class=\"form-control\" value=\""+res.data[i].amount+"\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+NWingredName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+NWingredName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
 
                 }
@@ -237,8 +238,8 @@
                     xhttp = new XMLHttpRequest();
                     xhttp.open("POST", "http://localhost:8080/api/auth/insertNewFriend/params?userName="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&newFriend=" + fbody[i].innerHTML,false);
                     xhttp.send();
-                    alert(JSON.parse(xhttp.responseText));
-                    alert(fbody[i].innerHTML); //second console output
+                    //alert(JSON.parse(xhttp.responseText));
+                    //alert(fbody[i].innerHTML); //second console output
                 }
 
                 $('#myModal').modal('hide');
@@ -259,12 +260,13 @@
     $('#the-basics').on('keydown', function(e) {
 
         if(e.which == 13) {
-            if(searchingred.indexOf(document.getElementById("ingredient-input").value) != -1 && basket.indexOf(document.getElementById("ingredient-input").value) == -1){
-    
-    //$(".sidebar-nav").append(" <li id="+ document.getElementById("ingredient-input").value +" class=\"list-group\"><a href=\"#\">"+ document.getElementById("ingredient-input").value +"</a><div class=\"input-group\"><span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default btn-number\" disabled=\"disabled\" data-type=\"minus\" data-field=\"quant[1]\"><span class=\"glyphicon glyphicon-minus\"></span></button></span><input type=\"text\" name=\"quant[1]\" class=\"form-control input-number\" value=\"1\" min=\"1\" max=\"10\"><span class=\"input-group-btn\"><button type=\"button\" class=\"btn btn-default btn-number\" data-type=\"plus\" data-field=\"quant[1]\"><span class=\"glyphicon glyphicon-plus\"></span></button></span></div></li>");
-    var recipeName = (document.getElementById("ingredient-input").value);
-    recipeName = recipeName.replace(/\s+/g,'');
-    $(".sidebar-nav").append(" <li id="+ recipeName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ document.getElementById("ingredient-input").value +"</a><div class=\"input-group spinner\"><input id="+ (document.getElementById("ingredient-input").value).replace(/\s+/g,'') +" type=\"text\" class=\"form-control\" value=\"0\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+recipeName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+recipeName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
+            //alert(basket);
+            //alert(document.getElementById("ingredient-input").value);
+            if(searchingred.indexOf(document.getElementById("ingredient-input")).value != -1 && basket.indexOf(document.getElementById("ingredient-input").value) == -1){
+                var recipeName = (document.getElementById("ingredient-input").value);
+                var beforecng = recipeName;
+                recipeName = recipeName.replace(/ *\([^)]*\) */g, "");
+                $(".sidebar-nav").append(" <li id="+ recipeName +" class=\"list-group\"><a class=\"listlink\" href=\"#\">"+ recipeName +"</a><div class=\"input-group spinner\"><input id="+ recipeName +" type=\"text\" class=\"form-control\" value=\"0\"><div class=\"input-group-btn-vertical\"><button class=\"btn btn-default\" type=\"button\" onclick=\"incre("+recipeName+")\"><i class=\"fa fa-caret-up\"></i></button><button class=\"btn btn-default\" type=\"button\" onclick=\"decre("+recipeName+")\"><i class=\"fa fa-caret-down\"></i></button></div></li>");
                 
                 //$(".sidebar-nav").append(" <li id="+ document.getElementById("ingredient-input").value +" class=\"list-group\"><a href=\"#\">"+ document.getElementById("ingredient-input").value +"</a></li>");
                 //$("#label-container").append(" <span id=\"ingred\" class=\"tag label label-info data-role=\"tagsinput\">"+ document.getElementById("ingredient-input").value +"<a><i class=\"remove glyphicon glyphicon-remove-sign glyphicon-white\"></i></a></span>");    
@@ -317,6 +319,11 @@
     <script>
     $("#menu-toggle").click(function(e) {
         e.preventDefault();
+        if($("#menu-toggle-btn").attr('class') == 'glyphicon glyphicon-chevron-right'){
+            $("#menu-toggle-btn").attr('class', 'glyphicon glyphicon-chevron-down');
+        }else{
+            $("#menu-toggle-btn").attr('class', 'glyphicon glyphicon-chevron-right');
+        }
         $("#wrapper").toggleClass("toggled");
     });
     </script>
@@ -425,8 +432,8 @@
             xhttp = new XMLHttpRequest();
             xhttp.open("POST", "http://localhost:8080/api/auth/insertNewFriend/params?userName="+document.getElementById("username").innerHTML.replace("<b class=\"caret\"></b>","")+"&newFriend=" + fbody[i].innerHTML,false);
             xhttp.send();
-            alert(JSON.parse(xhttp.responseText));
-            alert(fbody[i].innerHTML); //second console output
+            //alert(JSON.parse(xhttp.responseText));
+            //alert(fbody[i].innerHTML); //second console output
         }
 
         $('#myModal').modal('hide');
