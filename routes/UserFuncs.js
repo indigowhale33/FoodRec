@@ -41,7 +41,7 @@ var UserFuncs = function() {
                sendMessage(res, 400, "User already exists or problem querying database", "sign up", data);
             }
             else {
-                sendMessage(res, 200, "Sign up successful", "sign up", data);
+                res.redirect('/index.html?Registered=true');
             }
         });
     };
