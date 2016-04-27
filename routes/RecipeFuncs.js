@@ -311,6 +311,7 @@ var RecipeFuncs = function() {
 
     var getPossibleRecipesCombinedWithFriendsPantry = function(user_name, friend_name, res) {
 
+        /*
         var queryText = 
                 "SELECT * " +
                 "FROM recipes " +
@@ -320,6 +321,20 @@ var RecipeFuncs = function() {
                     "WHERE (recipe_ingredients.ingredient_id = pantries.ingredient_id) AND " + 
                     "(owner_name=\'" + user_name + "\' OR owner_name=\'" + friend_name + "\')" +
                 ");"
+        */
+
+        var queryText = 
+            "SELECT * " +
+            "FROM " +
+            "( " +
+                "SELECT recipe_id " +
+                "FROM recipe_ingredients ri LEFT JOIN pantries p " +
+                    "ON ri.ingredient_id = p.ingredient_id " + 
+                    "AND (p.owner_name = \'" + user_name + "\' OR p.owner_name = \'" + friend_name + "\') " +
+                "GROUP BY recipe_id " +
+                "HAVING COUNT(*) = COUNT(p.ingredient_id) " +
+            ") q JOIN recipes r " +
+                "ON q.recipe_id = r.id;";
 
         var queryDB = require('../database')(queryText, function(mssg, data) {
             //console.log(JSON.stringify(data, null, 2));
@@ -328,7 +343,7 @@ var RecipeFuncs = function() {
                 sendMessage(res, 400, "Failed", data, "get possible recipes combining two pantries");
             }
             else{
-                sendMessage(res, 200, mssg, data.splice(0,100), "get possible recipes combining two pantries");
+                sendMessage(res, 200, mssg, data, "get possible recipes combining two pantries");
             }
         });
     };
